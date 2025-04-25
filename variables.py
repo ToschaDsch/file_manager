@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-dir_for_checking = 'V:'
+dir_for_checking = '\\\DC-FUP\\Projekte\\Pruefung'
 name_of_the_folder = 'P-20'
 incoming_docs = 'Eingang Prüfunterlagen'
 by_checking = '0_Pläne zu prüfen'

@@ -170,11 +170,12 @@ def start_file_by_status(path: str, name: str, protokol_nr: int, folder_to_check
     for name_i in variables.names_of_protocol:
         name_of_the_protocol = name_i + str(protokol_nr)
         if name_of_the_protocol in all_folder:
+            if path[-1:] == "\\":
+                path = path[:-1]
             path += '\\' + name_of_the_protocol
             if subdir != '':
                 path += '\\' + subdir
             all_files = get_only_files(path=path)
-            path = path.replace('\\\\', '\\')
             if name in all_files:
                 path += '\\' + name
                 start_the_file(path=path)
