@@ -61,6 +61,7 @@ class GeneralWindow(QMainWindow):
         # menus at the bottom
         self.button_to_move = QPushButton(VariablesForMenus.text_for_button_move_file)
         self.button_to_open = QPushButton(VariablesForMenus.text_for_button_open)
+        self.button_to_open_list_of_protocols = QPushButton(VariablesForMenus.open_list_of_protocols)
         self.combobox_aim_to_move = QComboBox()
         self.combobox_protocol = QComboBox()
         self.make_menu_bottom(layout=general_layout)
@@ -70,11 +71,12 @@ class GeneralWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def make_menu_bottom(self, layout: QVBoxLayout):
-        self.make_menu_bottom_0(layout=layout)
-        self.make_menu_bottom_1(layout=layout)
+        self.make_menu_bottom_0(layout=layout)  # files open, copy
+        self.make_menu_bottom_1(layout=layout)  # protocols
+        self.make_menu_bottom_2(layout=layout)  # color palette
 
     def make_menu_bottom_0(self, layout: QVBoxLayout):
-        """menu with buttons"""
+        """menu with buttons open, copy"""
         layout_bottom = QHBoxLayout()
 
         self.button_to_open.setEnabled(False)
@@ -95,16 +97,30 @@ class GeneralWindow(QMainWindow):
         current_index = 0
         self.combobox_aim_to_move.setCurrentIndex(current_index)
         self.combobox_aim_to_move.currentIndexChanged.connect(self.change_index_of_combobox_aim)
+
         layout_bottom.addWidget(self.combobox_aim_to_move)
-
-        self.make_list_of_protocols()
-
-        layout_bottom.addWidget(self.combobox_protocol)
 
         layout.addLayout(layout_bottom)
 
+    def make_menu_bottom_1(self, layout: QVBoxLayout):
+        """menu with buttons protocols"""
+        layout_bottom = QHBoxLayout()
+
+        self.make_list_of_protocols()
+        layout_bottom.addWidget(self.combobox_protocol)
+
+        layout_bottom.addWidget(self.button_to_open_list_of_protocols)
+
+        self.make_list_of_file_in_the_protocol()
+        self.button_to_open_list_of_protocols.clicked.connect(self.show_the_files_in_the_protocol)
+
+        layout.addLayout(layout_bottom)
+
+    def show_the_files_in_the_protocol(self):
+        self.make_list_of_file_in_the_protocol()
+
     @staticmethod
-    def make_menu_bottom_1(layout: QVBoxLayout):
+    def make_menu_bottom_2(layout: QVBoxLayout):
         """menu for color palette at the bottom"""
         layout_palette = QHBoxLayout()
         for name_of_label, color in StatusFile.dict_of_palette_colors.items():
@@ -120,6 +136,19 @@ class GeneralWindow(QMainWindow):
     def open_the_picked_files(self):
         for file in self._picked_files:
             open_the_file(file=file)
+
+    def make_list_of_file_in_the_protocol(self):
+        list_of_file_in_protocol = []
+        for file in self._list_class_files:
+            if file.nr_protokol == self._number_of_current_protocol:
+                list_of_file_in_protocol.append(file)
+                print(file)
+        print('number of_ the _protocol', self._number_of_current_protocol)
+        # file open ---> all_files = self._current_dir_incoming_docs
+
+
+
+
 
     def make_list_of_protocols(self):
         self.combobox_protocol.clear()
@@ -182,9 +211,11 @@ class GeneralWindow(QMainWindow):
         unchecked -> by checking -> checked -> to send -> send
         you can move only in direction ->"""
         if status not in StatusFile.dict_of_status:
+            print('There is not status - ', status)
             return False
         nr_status = StatusFile.dict_of_status[status]
         if self._current_aim_to_move not in StatusFile.dict_of_status:
+            print('There is not aim - ', self._current_aim_to_move)
             return False
         nr_aim = StatusFile.dict_of_status[self._current_aim_to_move]
         return nr_status < nr_aim
@@ -292,7 +323,7 @@ class GeneralWindow(QMainWindow):
         VariablesForMenus.table_insert = False
 
     def change_index_of_combobox_aim(self, index: int):
-        self._current_aim_to_move = StatusFile.list_of_status[index]
+        self._current_aim_to_move = StatusFile.list_of_status[index + 1]
 
     def change_index_of_combobox_protocol(self, index: int):
         """the function checks if the protocol is not send"""
@@ -323,6 +354,7 @@ class GeneralWindow(QMainWindow):
         self.combobox_dir_project.setCurrentIndex(current_index)
 
         self.make_list_of_protocols()
+        self.make_list_of_file_in_the_protocol()
 
     def change_index_of_combobox_project(self, index: int):
         self._current_project = self._current_list_of_files_for_the_year[index]
@@ -331,6 +363,7 @@ class GeneralWindow(QMainWindow):
 
         self.make_list_for_all_files()
         self.make_list_of_protocols()
+        self.make_list_of_file_in_the_protocol()
         self.update_the_table()
 
     def update_the_table(self):
@@ -381,7 +414,6 @@ class GeneralWindow(QMainWindow):
                 list_of_classes_second.append(new_class)
             else:
                 list_of_classes_first.append(new_class)
-
         return list_of_classes_first + list_of_classes_second
 
     def make_class_for_a_file(self, name: str, path: str, folder: str) -> ClassFile:

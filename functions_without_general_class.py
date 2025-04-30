@@ -199,8 +199,11 @@ def copy_the_file(old_path: str, new_path: str, name: str):
         os.makedirs(new_path_for_the_folder)
     try:
         shutil.copyfile(old_path, new_path)
-    except:
+    except Exception as err:
         print('copy error', name)
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
+
 
 
 def move_from_unchecked_to_by_checking(file: ClassFile, protocol: str = ''):

@@ -26,3 +26,6 @@ class ClassFile:
         self.status = status
         self.nr_protokol = nr_protokol
         self.subdir = subdir
+
+    def __str__(self):
+        return self.name

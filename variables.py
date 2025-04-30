@@ -32,8 +32,9 @@ class VariablesForMenus:
     column_3_subdir = 100
     # menu at the bottom
     separator_for_menu_bottom = 30
-    text_for_button_move_file = 'den Plan schieben nach ->'
-    text_for_button_open = 'die Pläne offnen'
+    text_for_button_move_file = 'den Plan kopieren nach ->'
+    text_for_button_open = 'die Pläne öffnen'
+    open_list_of_protocols = 'Liste der Pläne im Prüfbericht'
 
 
 @dataclass
