@@ -11,13 +11,14 @@ from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
-    get_list_of_all_protocols
+    get_list_of_all_protocols, get_only_files, get_list_of_file_in_the_protocol
 from variables import VariablesForMenus
 
 
 class GeneralWindow(QMainWindow):
     def __init__(self, *args):
         super(GeneralWindow, self).__init__()
+        self.setWindowTitle(variables.name_of_the_program)
 
         general_layout = QVBoxLayout()
 
@@ -110,8 +111,6 @@ class GeneralWindow(QMainWindow):
         layout_bottom.addWidget(self.combobox_protocol)
 
         layout_bottom.addWidget(self.button_to_open_list_of_protocols)
-
-        self.make_list_of_file_in_the_protocol()
         self.button_to_open_list_of_protocols.clicked.connect(self.show_the_files_in_the_protocol)
 
         layout.addLayout(layout_bottom)
@@ -138,17 +137,14 @@ class GeneralWindow(QMainWindow):
             open_the_file(file=file)
 
     def make_list_of_file_in_the_protocol(self):
-        list_of_file_in_protocol = []
-        for file in self._list_class_files:
-            if file.nr_protokol == self._number_of_current_protocol:
-                list_of_file_in_protocol.append(file)
-                print(file)
-        print('number of_ the _protocol', self._number_of_current_protocol)
-        # file open ---> all_files = self._current_dir_incoming_docs
-
-
-
-
+        list_of_file_in_protocol = get_list_of_file_in_the_protocol(list_of_all_files=self._list_class_files,
+                                                                    current_dir_incoming_docs=self._current_dir_incoming_docs,
+                                                                    number_of_current_protocol=self._number_of_current_protocol
+                                                                    )
+        if list_of_file_in_protocol is None:
+            return None
+        for file in list_of_file_in_protocol:
+            print(file.print_values)
 
     def make_list_of_protocols(self):
         self.combobox_protocol.clear()
@@ -163,7 +159,7 @@ class GeneralWindow(QMainWindow):
 
         for i, protocol_i in enumerate(self._list_send_protocols):
             self.combobox_protocol.addItem(str(protocol_i))
-            model.setData(model.index(n + i+1, 0), QColor(*variables.MyColor.is_send), QtCore.Qt.BackgroundRole)
+            model.setData(model.index(n + i + 1, 0), QColor(*variables.MyColor.is_send), QtCore.Qt.BackgroundRole)
 
         current_index = 0
         self.combobox_protocol.currentIndexChanged.connect(self.change_index_of_combobox_protocol)
@@ -354,7 +350,6 @@ class GeneralWindow(QMainWindow):
         self.combobox_dir_project.setCurrentIndex(current_index)
 
         self.make_list_of_protocols()
-        self.make_list_of_file_in_the_protocol()
 
     def change_index_of_combobox_project(self, index: int):
         self._current_project = self._current_list_of_files_for_the_year[index]
@@ -363,7 +358,6 @@ class GeneralWindow(QMainWindow):
 
         self.make_list_for_all_files()
         self.make_list_of_protocols()
-        self.make_list_of_file_in_the_protocol()
         self.update_the_table()
 
     def update_the_table(self):

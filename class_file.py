@@ -26,6 +26,13 @@ class ClassFile:
         self.status = status
         self.nr_protokol = nr_protokol
         self.subdir = subdir
+        self.name_of_file_in_the_table = ''
+        self.name_of_the_plan = ''
+        self.index = ''
 
     def __str__(self):
         return self.name
+
+    @property
+    def print_values(self):
+        return f"{self.name_of_file_in_the_table} {self.index} \t {self.name_of_the_plan}"

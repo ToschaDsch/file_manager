@@ -1,5 +1,8 @@
+import io
 import os
 import shutil
+
+import openpyxl
 
 import variables
 from class_file import StatusFile, ClassFile
@@ -115,9 +118,10 @@ def get_dict_with_protocol_files(path: str, folders: [str]) -> dict:
                 nummer_i = folder_i.replace(name_i, '')
                 try:
                     nummer_i = int(nummer_i)
-                except:
+                except Exception as err:
                     print('there is no number', folder_i)
-                    break
+                    print(f"Unexpected {err=}, {type(err)=}")
+                    raise
                 path_i = path + '\\' + folder_i
                 dict_protokol_files[nummer_i] = dict()
                 dict_protokol_files[nummer_i][0] = get_only_files(path=path_i)
@@ -205,7 +209,6 @@ def copy_the_file(old_path: str, new_path: str, name: str):
         raise
 
 
-
 def move_from_unchecked_to_by_checking(file: ClassFile, protocol: str = ''):
     old_path = file.path
     if protocol == '':
@@ -263,3 +266,87 @@ def open_the_file(file: ClassFile):
                                  folder_to_check=variables.files_to_send, subdir=file.subdir)
         case StatusFile.is_send:
             start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
+
+
+def get_list_of_file_in_the_protocol(list_of_all_files: [ClassFile], number_of_current_protocol: int,
+                                     current_dir_incoming_docs: str) -> [ClassFile]:
+    list_of_file_in_protocol = []
+    for file in list_of_all_files:
+        if file.nr_protokol == number_of_current_protocol:
+            list_of_file_in_protocol.append(file)
+    all_files = get_only_files(path=current_dir_incoming_docs)
+    all_excel_files = [name for name in all_files if name[-5:] == '.xlsx']
+    file_name = ''
+    for file in all_excel_files:
+        if file.find(variables.text_of_the_excel_file):
+            file_name = file
+            break
+    if file_name == '':
+        return None
+    dir_for_excel_file = current_dir_incoming_docs + '\\' + file_name
+    dict_files = file_excel_open_get_date(file_name=dir_for_excel_file)
+    if dict_files is None:
+        return None
+    return get_new_list_of_files_in_the_protocol(dict_files=dict_files, list_of_files=list_of_file_in_protocol)
+
+
+def get_new_list_of_files_in_the_protocol(dict_files: dict[str], list_of_files: [ClassFile]) -> [ClassFile]:
+    print('check the list')
+    new_list_of_file = []
+    dict_of_names = dict()
+    for file_table in dict_files:
+        if len(file_table) < 2:
+            continue
+        try:
+            index = file_table.index(variables.text_index)
+            file_name = file_table[:index].replace(" ", "")
+            index = file_table[index + 7:].replace(" ", "")
+            if index == '-':
+                index = ''
+        except:
+            file_name = file_table
+            index = ''
+        value = dict_files[file_table]
+        if file_name in dict_of_names:  # check the new index
+            if index > dict_of_names[file_name][1]:
+                dict_of_names[file_name] = [index, value]
+            else:
+                continue
+        else:   # there is no file in the dict
+            dict_of_names[file_name] = [index, value]
+    for file in list_of_files:
+        for file_name, values in dict_of_names.items():
+            index, value = values
+
+            if file.name.find(file_name) > 0:
+                file_2 = ClassFile(name=file.name, status=file.status, nr_protokol=file.nr_protokol, subdir=file.subdir,
+                                   path=file.path)
+                file_2.name_of_file_in_the_table = file_name
+                file_2.name_of_the_plan = value
+                file_2.index = index
+                new_list_of_file.append(file_2)
+    return new_list_of_file
+
+
+def file_excel_open_get_date(file_name: str) -> dict[str] | None:
+    with (open(file_name, "rb") as f):
+        try:
+            in_mem_file = io.BytesIO(f.read())
+        except FileExistsError:
+            print('can not open the file')
+            return None
+        print(file_name)
+        work_book = openpyxl.load_workbook(in_mem_file, read_only=True)
+        print(work_book)
+        print(work_book.sheetnames)
+        sheet = work_book.active
+        i = 2
+        dict_files = dict()
+        while sheet.cell(row=i, column=1).value is not None:
+            name_index = str(sheet.cell(row=i, column=2).value)
+            value = str(sheet.cell(row=i, column=10).value)
+            value = '' if value == 'None' else value
+            i += 1
+            dict_files[name_index] = value
+        work_book.close()
+    return dict_files

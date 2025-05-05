@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+name_of_the_program = 'file_manager_'
+
 dir_for_checking = '\\\DC-FUP\\Projekte\\Pruefung'
 name_of_the_folder = 'P-20'
 incoming_docs = 'Eingang Prüfunterlagen'
@@ -12,6 +14,8 @@ variants_of_the_ending = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-
 names_of_protocol = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
 protocol = 'Prüfbericht'
 list_of_aims = [by_checking, checked_files_planes, files_to_send]
+text_of_the_excel_file = 'Verlauf'
+text_index = ' Index '
 
 
 @dataclass
