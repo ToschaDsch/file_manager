@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 
 name_of_the_program = 'file_manager_'
+file_of_settings = 'settings.txt'
+current_year = 'P-2024'
+current_project = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 
 dir_for_checking = '\\\DC-FUP\\Projekte\\Pruefung'
 name_of_the_folder = 'P-20'
@@ -9,7 +12,7 @@ by_checking = '0_Pläne zu prüfen'
 checked_files = 'geprüfte Unterlagen'
 checked_files_planes = '1_geprüfte Pläne'
 files_to_send = '2_Pläne zu schicken'
-folder_that_i_dont_need = ['Statik', 'statik', 'überholt', 'Überholt', 'überholte Pläne']
+folder_that_i_dont_need = ['überholt', 'Überholt', 'überholte Pläne']   #'Statik', 'statik',
 variants_of_the_ending = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
 names_of_protocol = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
 protocol = 'Prüfbericht'

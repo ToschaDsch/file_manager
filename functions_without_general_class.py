@@ -291,7 +291,6 @@ def get_list_of_file_in_the_protocol(list_of_all_files: [ClassFile], number_of_c
 
 
 def get_new_list_of_files_in_the_protocol(dict_files: dict[str], list_of_files: [ClassFile]) -> [ClassFile]:
-    print('check the list')
     new_list_of_file = []
     dict_of_names = dict()
     for file_table in dict_files:

@@ -1,3 +1,4 @@
+import json
 import os
 
 from PySide6 import QtCore
@@ -11,7 +12,7 @@ from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
-    get_list_of_all_protocols, get_only_files, get_list_of_file_in_the_protocol
+    get_list_of_all_protocols, get_list_of_file_in_the_protocol
 from variables import VariablesForMenus
 
 
@@ -26,9 +27,9 @@ class GeneralWindow(QMainWindow):
         dir_0 = variables.dir_for_checking
         raw_list_of_all_folder = os.listdir(dir_0)
         self._list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
-        self._current_dir_year = dir_0
+        self._current_dir_year = variables.dir_for_checking + '\\' + variables.current_year
         self._current_list_of_files_for_the_year = []
-        self._current_project = ''
+        self._current_project = variables.current_project
         self._current_dir_project = ''
         self._current_list_of_files = []
         self._current_dir_incoming_docs = ''
@@ -70,6 +71,20 @@ class GeneralWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(general_layout)
         self.setCentralWidget(widget)
+
+    def closeEvent(self, event):
+        # save the settings by file close
+        path = variables.file_of_settings
+        settings_0 = {'dir_for_checking': variables.dir_for_checking,
+                      'year': variables.current_year,
+                      'project': self._current_project}
+        try:
+            with open(path, 'w') as file:
+                json.dump(settings_0, file, indent=4)
+            print(f"Dictionary saved as JSON to '{path}'.")
+        except Exception as e:
+            print(f"Error saving file: {e}")
+        event.accept()  # Accept the close event
 
     def make_menu_bottom(self, layout: QVBoxLayout):
         self.make_menu_bottom_0(layout=layout)  # files open, copy
@@ -232,8 +247,9 @@ class GeneralWindow(QMainWindow):
         self.general_table.itemSelectionChanged.connect(self.table_selection_changed)
         self.general_table.itemDoubleClicked.connect(self.double_click_the_table_item)
         layout.addWidget(self.general_table)
-        current_index = 120
-        self.combobox_dir_project.setCurrentIndex(current_index)
+
+        index = self._current_list_of_files_for_the_year.index(variables.current_project)
+        self.combobox_dir_project.setCurrentIndex(index)
 
     def make_top_menu(self, layout: QVBoxLayout, list_of_dir):
         # make the current directory
@@ -245,14 +261,15 @@ class GeneralWindow(QMainWindow):
         # make it for year
         for dir_i in list_of_dir:
             self.combobox_dir_year.addItem(str(dir_i))
-        current_index = len(list_of_dir) - 2 if len(list_of_dir) > 1 else 0
+        if variables.current_year not in list_of_dir:
+            current_index = 0
+        else:
+            current_index = list_of_dir.index(variables.current_year)
         self.combobox_dir_year.setCurrentIndex(current_index)
         self.combobox_dir_year.currentIndexChanged.connect(self.change_index_of_combobox_year)
 
-        current_folder_year = list_of_dir[current_index]
-        self._current_dir_year = self._current_dir_year + '\\' + current_folder_year
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
-        self._current_project = self._current_list_of_files_for_the_year[0]
+        self._current_project = variables.current_project
         self._current_dir_project = self._current_dir_year + '\\' + self._current_project
         self._list_of_all_files_of_the_project = get_only_folders(path=self._current_dir_project)
         self._current_dir_incoming_docs = self._current_dir_project + '\\' + variables.incoming_docs
@@ -339,6 +356,7 @@ class GeneralWindow(QMainWindow):
     def change_index_of_combobox_year(self, index: int):
         current_year = self._list_of_years[index]
         self._current_dir_year = variables.dir_for_checking + '\\' + current_year
+        variables.current_year = current_year
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = self._current_list_of_files_for_the_year[0]
         self._current_dir_project = self._current_dir_year + '\\' + self._current_project
