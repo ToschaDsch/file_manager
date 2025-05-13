@@ -43,6 +43,7 @@ class GeneralWindow(QMainWindow):
         self._picked_files = []
         self._current_aim_to_move = StatusFile.list_of_status[0]
         self._list_of_protocols = [0]
+        self._current_protocol = ''
         self._list_send_protocols = []
         self._number_of_current_protocol = 0
         self._last_two_numbers_of_current_protocol = '00'
@@ -158,6 +159,7 @@ class GeneralWindow(QMainWindow):
                                                                     )
         if list_of_file_in_protocol is None:
             return None
+        print('list of files for ', self._current_protocol)
         for file in list_of_file_in_protocol:
             print(file.print_values)
 
@@ -345,6 +347,7 @@ class GeneralWindow(QMainWindow):
             self.combobox_protocol.setCurrentIndex(0)
             return None
         name_of_current_protocol = self._list_of_protocols[index]
+        self._current_protocol = name_of_current_protocol
         if name_of_current_protocol not in self._list_of_protocols:
             return None
         for i in range(4, len(name_of_current_protocol)):
