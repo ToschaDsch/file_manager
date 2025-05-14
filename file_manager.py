@@ -10,7 +10,7 @@ from variables import VariablesForMenus
 from window_1 import GeneralWindow
 
 
-def load_general_menu():
+def load_general_menu(show_static: bool = False):
     basedir = os.path.dirname(__file__)
     # basedir = os.path.join(basedir, 'icons\\icon.png')  # icon for general program
 
@@ -20,7 +20,7 @@ def load_general_menu():
     size = screen.size()
     VariablesForMenus.screen_width = size.width()
     VariablesForMenus.screen_height = size.height()
-    VariablesForMenus.general_window = GeneralWindow()
+    VariablesForMenus.general_window = GeneralWindow(show_static=show_static)
     VariablesForMenus.general_window.show()
     sys.exit(app.exec())
 
@@ -40,7 +40,8 @@ def get_dict_settings_from_file() -> dict:
                 print(data_dict)
                 return {'dir_for_checking': data_dict['dir_for_checking'],
                         'year': data_dict['year'],
-                        'project': data_dict['project']}
+                        'project': data_dict['project'],
+                        'show_static': data_dict['show_static']}
             except json.JSONDecodeError:
                 print("The file content is not valid JSON.")
         except Exception as e:
@@ -55,7 +56,8 @@ def get_dict_settings_from_file() -> dict:
         project = current_list_of_files_for_the_year[0]
         settings_0 = {'dir_for_checking': variables.dir_for_checking,
                       'year': current_year,
-                      'project': project}
+                      'project': project,
+                      'show_static': False}
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -66,11 +68,10 @@ def get_dict_settings_from_file() -> dict:
 
 
 if __name__ == "__main__":
-
     # update settings
     settings = get_dict_settings_from_file()
     variables.dir_for_checking = settings['dir_for_checking']
     variables.current_year = settings['year']
     variables.current_project = settings['project']
-
-    load_general_menu()
+    show_static = settings['show_static']
+    load_general_menu(show_static=show_static)

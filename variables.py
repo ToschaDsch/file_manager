@@ -12,7 +12,8 @@ by_checking = '0_Pläne zu prüfen'
 checked_files = 'geprüfte Unterlagen'
 checked_files_planes = '1_geprüfte Pläne'
 files_to_send = '2_Pläne zu schicken'
-folder_that_i_dont_need = ['überholt', 'Überholt', 'überholte Pläne']   #'Statik', 'statik',
+folder_that_i_dont_need = ['überholt', 'Überholt', 'überholte Pläne']   #
+folder_that_i_dont_need_with_statik = ['Statik', 'statik']
 variants_of_the_ending = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
 names_of_protocol = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
 protocol = 'Prüfbericht'
@@ -42,6 +43,7 @@ class VariablesForMenus:
     text_for_button_move_file = 'den Plan kopieren nach ->'
     text_for_button_open = 'die Pläne öffnen'
     open_list_of_protocols = 'Liste der Pläne im Prüfbericht'
+    text_show_static = "zeige Statik"
 
 
 @dataclass

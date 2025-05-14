@@ -5,7 +5,7 @@ from PySide6 import QtCore
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
-    QPushButton, QLabel
+    QPushButton, QLabel, QCheckBox
 
 import variables
 from class_file import StatusFile, ClassFile
@@ -17,7 +17,7 @@ from variables import VariablesForMenus
 
 
 class GeneralWindow(QMainWindow):
-    def __init__(self, *args):
+    def __init__(self, show_static: bool = False, *args):
         super(GeneralWindow, self).__init__()
         self.setWindowTitle(variables.name_of_the_program)
 
@@ -47,6 +47,12 @@ class GeneralWindow(QMainWindow):
         self._list_send_protocols = []
         self._number_of_current_protocol = 0
         self._last_two_numbers_of_current_protocol = '00'
+
+        self._show_static = show_static
+        if show_static:
+            self._folder_that_i_dont_need = variables.folder_that_i_dont_need
+        else:
+            self._folder_that_i_dont_need = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
 
         # menu up
         self.combobox_aim_to_move = QComboBox()
@@ -78,7 +84,8 @@ class GeneralWindow(QMainWindow):
         path = variables.file_of_settings
         settings_0 = {'dir_for_checking': variables.dir_for_checking,
                       'year': variables.current_year,
-                      'project': self._current_project}
+                      'project': self._current_project,
+                      'show_static': self._show_static}
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -90,7 +97,8 @@ class GeneralWindow(QMainWindow):
     def make_menu_bottom(self, layout: QVBoxLayout):
         self.make_menu_bottom_0(layout=layout)  # files open, copy
         self.make_menu_bottom_1(layout=layout)  # protocols
-        self.make_menu_bottom_2(layout=layout)  # color palette
+        self.make_menu_bottom_2(layout=layout)  # settings (show static)
+        self.make_menu_bottom_3(layout=layout)  # color palette
 
     def make_menu_bottom_0(self, layout: QVBoxLayout):
         """menu with buttons open, copy"""
@@ -131,11 +139,30 @@ class GeneralWindow(QMainWindow):
 
         layout.addLayout(layout_bottom)
 
+    def make_menu_bottom_2(self, layout: QVBoxLayout):
+        """menu with settings (show static)"""
+        layout_bottom = QHBoxLayout()
+
+        checkbox_show_static = QCheckBox(VariablesForMenus.text_show_static)
+        checkbox_show_static.setChecked(self._show_static)
+        checkbox_show_static.stateChanged.connect(self.checkbox_changed_show_static)
+        layout_bottom.addWidget(checkbox_show_static)
+
+        layout.addLayout(layout_bottom)
+
+    def checkbox_changed_show_static(self, state: int):
+        self._show_static = bool(state)
+        if state:
+            self._folder_that_i_dont_need = variables.folder_that_i_dont_need
+        else:
+            self._folder_that_i_dont_need = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
+        self.refresh_all()
+
     def show_the_files_in_the_protocol(self):
         self.make_list_of_file_in_the_protocol()
 
     @staticmethod
-    def make_menu_bottom_2(layout: QVBoxLayout):
+    def make_menu_bottom_3(layout: QVBoxLayout):
         """menu for color palette at the bottom"""
         layout_palette = QHBoxLayout()
         for name_of_label, color in StatusFile.dict_of_palette_colors.items():
@@ -155,7 +182,8 @@ class GeneralWindow(QMainWindow):
     def make_list_of_file_in_the_protocol(self):
         list_of_file_in_protocol = get_list_of_file_in_the_protocol(list_of_all_files=self._list_class_files,
                                                                     current_dir_incoming_docs=self._current_dir_incoming_docs,
-                                                                    number_of_current_protocol=self._number_of_current_protocol
+                                                                    number_of_current_protocol=int(
+                                                                        self._last_two_numbers_of_current_protocol)
                                                                     )
         if list_of_file_in_protocol is None:
             return None
@@ -374,6 +402,9 @@ class GeneralWindow(QMainWindow):
 
     def change_index_of_combobox_project(self, index: int):
         self._current_project = self._current_list_of_files_for_the_year[index]
+        self.refresh_all()
+
+    def refresh_all(self):
         self._current_dir_project = self._current_dir_year + '\\' + self._current_project
         self._list_of_all_files_of_the_project = get_only_folders(path=self._current_dir_project)
 
@@ -396,7 +427,7 @@ class GeneralWindow(QMainWindow):
             return None
         self._current_dir_incoming_docs = self._current_dir_project + '\\' + variables.incoming_docs
         list_of_folders = get_only_folders(path=self._current_dir_incoming_docs)
-        set_of_folders = set(list_of_folders) - set(variables.folder_that_i_dont_need)
+        set_of_folders = set(list_of_folders) - set(self._folder_that_i_dont_need)
         list_of_folders = list(set_of_folders)
         self._current_list_of_files = []
         # files in folders
