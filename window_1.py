@@ -2,7 +2,7 @@ import json
 import os
 
 from PySide6 import QtCore
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
     QPushButton, QLabel, QCheckBox
@@ -12,7 +12,7 @@ from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
-    get_list_of_all_protocols, get_list_of_file_in_the_protocol
+    get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol
 from variables import VariablesForMenus
 
 
@@ -39,6 +39,7 @@ class GeneralWindow(QMainWindow):
         self._dict_checked_files = dict()
         self._dict_to_send_files = dict()
         self._set_send_files = {}
+        self._selected_rows = []
 
         self._picked_files = []
         self._current_aim_to_move = StatusFile.list_of_status[0]
@@ -70,7 +71,8 @@ class GeneralWindow(QMainWindow):
         # menus at the bottom
         self.button_to_move = QPushButton(VariablesForMenus.text_for_button_move_file)
         self.button_to_open = QPushButton(VariablesForMenus.text_for_button_open)
-        self.button_to_open_list_of_protocols = QPushButton(VariablesForMenus.open_list_of_protocols)
+        self.button_to_open_list_of_protocols = QPushButton(VariablesForMenus.open_list_of_files_in_the_protocol)
+        self.button_move_the_file_to_the_protocol = QPushButton(VariablesForMenus.text_move_the_file)
         self.combobox_aim_to_move = QComboBox()
         self.combobox_protocol = QComboBox()
         self.make_menu_bottom(layout=general_layout)
@@ -78,6 +80,16 @@ class GeneralWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(general_layout)
         self.setCentralWidget(widget)
+
+    def changeEvent(self, event):
+        if event.type() == QEvent.ActivationChange:
+            if self.isActiveWindow():
+                self.on_application_activated()
+        super().changeEvent(event)
+
+    def on_application_activated(self):
+        # This function runs automatically when the app is focused
+        self.select_rows(row_indices=self._selected_rows)
 
     def closeEvent(self, event):
         # save the settings by file close
@@ -134,10 +146,24 @@ class GeneralWindow(QMainWindow):
         self.make_list_of_protocols()
         layout_bottom.addWidget(self.combobox_protocol)
 
+        self.button_move_the_file_to_the_protocol.clicked.connect(self.move_the_file_to_the_protocol)
+        layout_bottom.addWidget(self.button_move_the_file_to_the_protocol)
+        self.button_move_the_file_to_the_protocol.setEnabled(False)
+
         layout_bottom.addWidget(self.button_to_open_list_of_protocols)
         self.button_to_open_list_of_protocols.clicked.connect(self.show_the_files_in_the_protocol)
 
         layout.addLayout(layout_bottom)
+
+    def move_the_file_to_the_protocol(self):
+        current_protocol = int(self._last_two_numbers_of_current_protocol)
+        for file in self._picked_files:
+            if file.nr_protokol != current_protocol and file.status != StatusFile.unchecked:
+                protocol = variables.protocol + ' ' + str(int(self._last_two_numbers_of_current_protocol))
+                move_the_file_to_new_protocol(file=file, new_protocol=protocol)
+                file.nr_protokol = current_protocol
+        self.update_the_table()
+        self.select_rows(row_indices=self._selected_rows)
 
     def make_menu_bottom_2(self, layout: QVBoxLayout):
         """menu with settings (show static)"""
@@ -178,6 +204,7 @@ class GeneralWindow(QMainWindow):
     def open_the_picked_files(self):
         for file in self._picked_files:
             open_the_file(file=file)
+        self.select_rows(row_indices=self._selected_rows)
 
     def make_list_of_file_in_the_protocol(self):
         list_of_file_in_protocol = get_list_of_file_in_the_protocol(list_of_all_files=self._list_class_files,
@@ -215,6 +242,7 @@ class GeneralWindow(QMainWindow):
         for file_i in self._picked_files:
             self.move_the_file(file=file_i)
         self.update_the_table()
+        self.select_rows(row_indices=self._selected_rows)
 
     def move_the_file(self, file: ClassFile):
         # check - can I move it
@@ -310,16 +338,32 @@ class GeneralWindow(QMainWindow):
         self.combobox_dir_project.currentIndexChanged.connect(self.change_index_of_combobox_project)
 
     def table_selection_changed(self):
+        if VariablesForMenus.table_insert:
+            return None
         items = self.general_table.selectedItems()
         rows = [x.row() for x in items]
+        self._selected_rows = rows
         self._picked_files = [self._list_class_files[x] for x in rows]
+        list_of_button = [self.button_to_open,
+                          self.button_to_move,
+                          self.button_move_the_file_to_the_protocol]
         if len(self._picked_files) > 0:
-            self.button_to_open.setEnabled(True)
-            self.button_to_move.setEnabled(True)
+            is_enabled = True
         else:
-            self.button_to_open.setEnabled(False)
-            self.button_to_move.setEnabled(False)
+            is_enabled = False
+        for button in list_of_button:
+            button.setEnabled(is_enabled)
         self.aim_to_change()
+
+    def select_rows(self, row_indices: [int]):
+        VariablesForMenus.table_insert = True
+        for row in row_indices:
+
+            for col in range(self.general_table.columnCount()):
+                item = self.general_table.item(row, col)
+                if item:  # Make sure the cell is not None
+                    item.setSelected(True)
+        VariablesForMenus.table_insert = False
 
     def aim_to_change(self):
         """if you select the files, you need to know status for all the files

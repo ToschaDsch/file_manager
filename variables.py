@@ -5,13 +5,15 @@ file_of_settings = 'settings.txt'
 current_year = 'P-2024'
 current_project = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 
-dir_for_checking = '\\\DC-FUP\\Projekte\\Pruefung'
+dir_for_checking = 'V:\\'
 name_of_the_folder = 'P-20'
 incoming_docs = 'Eingang Prüfunterlagen'
-by_checking = '0_Pläne zu prüfen'
 checked_files = 'geprüfte Unterlagen'
+by_checking = '0_Pläne zu prüfen'
 checked_files_planes = '1_geprüfte Pläne'
 files_to_send = '2_Pläne zu schicken'
+file_name_not_to_scan = {by_checking, checked_files_planes, files_to_send,
+                         'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
 folder_that_i_dont_need = ['überholt', 'Überholt', 'überholte Pläne']   #
 folder_that_i_dont_need_with_statik = ['Statik', 'statik']
 variants_of_the_ending = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
@@ -20,6 +22,7 @@ protocol = 'Prüfbericht'
 list_of_aims = [by_checking, checked_files_planes, files_to_send]
 text_of_the_excel_file = 'Verlauf'
 text_index = ' Index '
+name_of_the_useful_cell_in_the_excel_file = "Inhalt"
 
 
 @dataclass
@@ -42,8 +45,9 @@ class VariablesForMenus:
     separator_for_menu_bottom = 30
     text_for_button_move_file = 'den Plan kopieren nach ->'
     text_for_button_open = 'die Pläne öffnen'
-    open_list_of_protocols = 'Liste der Pläne im Prüfbericht'
+    open_list_of_files_in_the_protocol = 'Liste der Pläne im Prüfbericht'
     text_show_static = "zeige Statik"
+    text_move_the_file = 'Verschieben die Pläne zum Prüfbericht'
 
 
 @dataclass

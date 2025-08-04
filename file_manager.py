@@ -25,7 +25,7 @@ def load_general_menu(show_static: bool = False):
     sys.exit(app.exec())
 
 
-def get_dict_settings_from_file() -> dict:
+def get_dict_settings_from_file() -> dict | None:
     path = variables.file_of_settings
     if os.path.exists(path):
         try:
@@ -46,13 +46,14 @@ def get_dict_settings_from_file() -> dict:
                 print("The file content is not valid JSON.")
         except Exception as e:
             print(f"Error reading the file: {e}")
+            return None
     else:
         print(f"The file does not exist at: {path}")
         dir_0 = variables.dir_for_checking
         raw_list_of_all_folder = os.listdir(dir_0)
         list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
         current_year = list_of_years[-1]
-        current_list_of_files_for_the_year = get_only_folders(path=dir_0 + '\\' + current_year)
+        current_list_of_files_for_the_year: [] = get_only_folders(path=dir_0 + '\\' + current_year)
         project = current_list_of_files_for_the_year[0]
         settings_0 = {'dir_for_checking': variables.dir_for_checking,
                       'year': current_year,
