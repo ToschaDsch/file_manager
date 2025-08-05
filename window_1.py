@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QT
 
 import variables
 from class_file import StatusFile, ClassFile
-from functions_without_general_class import open_the_file, check_the_file, get_dict_checked_files, \
+from functions_without_general_class import open_the_file, check_the_file, get_dict_of_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
     get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol
@@ -39,7 +39,7 @@ class GeneralWindow(QMainWindow):
         self._dict_checked_files = dict()
         self._dict_to_send_files = dict()
         self._set_send_files = {}
-        self._selected_rows = []
+        self._selected_rows: list[int] = list()
 
         self._picked_files = []
         self._current_aim_to_move = StatusFile.list_of_status[0]
@@ -354,11 +354,11 @@ class GeneralWindow(QMainWindow):
         for button in list_of_button:
             button.setEnabled(is_enabled)
         self.aim_to_change()
+        return None
 
-    def select_rows(self, row_indices: [int]):
+    def select_rows(self, row_indices: list[int]):
         VariablesForMenus.table_insert = True
         for row in row_indices:
-
             for col in range(self.general_table.columnCount()):
                 item = self.general_table.item(row, col)
                 if item:  # Make sure the cell is not None
@@ -427,6 +427,8 @@ class GeneralWindow(QMainWindow):
                 number = name_of_current_protocol[i: i + 2]
                 self._last_two_numbers_of_current_protocol = number
                 break
+            return None
+        return None
 
     def change_index_of_combobox_year(self, index: int):
         current_year = self._list_of_years[index]
@@ -487,14 +489,15 @@ class GeneralWindow(QMainWindow):
                 self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
         # list of all send files
         self._dict_by_checking_files = get_dict_of_by_checking_files(path=self._current_dir_project)
-        self._dict_checked_files = get_dict_checked_files(path=self._current_dir_project,
-                                                          dict_by_checking=self._dict_by_checking_files)
+        self._dict_checked_files = get_dict_of_checked_files(path=self._current_dir_project,
+                                                             dict_by_checking=self._dict_by_checking_files)
         self._dict_to_send_files = get_dict_to_send_files(path=self._current_dir_project,
                                                           dict_checked_files=self._dict_checked_files)
         self._set_send_files = set(get_list_of_send_files(path=self._current_dir_project))
         self._list_class_files = self.make_list_of_class_files(self._current_list_of_files)
+        return None
 
-    def make_list_of_class_files(self, list_of_file_path) -> [ClassFile]:
+    def make_list_of_class_files(self, list_of_file_path) -> list[ClassFile]:
         """the function makes two lists of files other files and send files"""
         list_of_classes_first = []
         list_of_classes_second = []  # send

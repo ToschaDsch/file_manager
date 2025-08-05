@@ -46,7 +46,7 @@ def start_file_is_send(path: str, name: str, subdir: str):
             start_the_file(path=path)
 
 
-def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, str] | bool:
+def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, int] | bool:
     for protocol_nr_i, dict_of_files_i in dict_i.items():
         if folder == '':
             if protocol_nr_i == 0:
@@ -73,20 +73,20 @@ def get_dict_to_send_files(path: str, dict_checked_files: dict) -> dict:
     all_folder = get_only_folders(path=path)
     if variables.files_to_send not in set(all_folder):
         print('no subdir', variables.files_to_send)
-        return {}
+        return dict()
     path = path + '\\' + variables.files_to_send
     all_folder = get_only_folders(path=path)
     return get_dict_with_protocol_files(path=path, folders=all_folder)
 
 
-def get_dict_checked_files(path: str, dict_by_checking: dict) -> dict:
+def get_dict_of_checked_files(path: str, dict_by_checking: dict) -> dict:
     if len(dict_by_checking) == 0:
         return dict()
     path = path + '\\' + variables.checked_files
     all_folder = get_only_folders(path=path)
     if variables.checked_files_planes not in set(all_folder):
         print('no subdir', variables.checked_files_planes)
-        return {}
+        return dict()
     path = path + '\\' + variables.checked_files_planes
     all_folder = get_only_folders(path=path)
     return get_dict_with_protocol_files(path=path, folders=all_folder)
@@ -96,26 +96,24 @@ def get_dict_of_by_checking_files(path: str) -> dict:
     all_folder = get_only_folders(path=path)
     if variables.checked_files not in set(all_folder):
         print('no subdir !!', variables.checked_files)
-        return {}
+        return dict()
     path = path + '\\' + variables.checked_files
     all_folder = get_only_folders(path=path)
     if variables.by_checking not in set(all_folder):
         print('no subdir', variables.by_checking)
-        return {}
+        return dict()
     path = path + '\\' + variables.by_checking
     all_folder = get_only_folders(path=path)
     return get_dict_with_protocol_files(path=path, folders=all_folder)
 
 
 def get_dict_with_protocol_files(path: str, folders: list[str]) -> dict:
-    only_files = get_only_files(path=path)
     # all files in folders
-    dict_protokol_files = {0: only_files}
+    dict_protokol_files = dict()
 
     for folder_i in folders:
         for name_i in variables.names_of_protocol:
             if folder_i.find(name_i) != -1:
-
                 nummer_i = folder_i.replace(name_i, '')
                 try:
                     nummer_i = int(nummer_i)
@@ -124,8 +122,7 @@ def get_dict_with_protocol_files(path: str, folders: list[str]) -> dict:
                     print(f"Unexpected {err=}, {type(err)=}")
                     raise
                 path_i = path + '\\' + folder_i
-                dict_protokol_files[nummer_i] = dict()
-                dict_protokol_files[nummer_i][0] = get_only_files(path=path_i)
+                dict_protokol_files[nummer_i] = {0:get_only_files(path=path_i)}
                 folders_ii = get_only_folders(path=path_i)
                 for folder_j in folders_ii:
                     path_j = path_i + '\\' + folder_j
@@ -197,7 +194,7 @@ def start_the_file(path: str):
     os.startfile(path)
 
 
-def copy_the_file(old_path: str, new_path: str, name: str):
+def copy_the_file(old_path: str, new_path: str, name: str) -> None:
     print('I copy the file', name)
     print('from', old_path)
     print('to', new_path)
@@ -211,13 +208,14 @@ def copy_the_file(old_path: str, new_path: str, name: str):
         os.makedirs(new_path_for_the_folder)
     try:
         shutil.copyfile(old_path, new_path)
+        return None
     except Exception as err:
         print('copy error', name)
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
 
-def move_the_file(old_path: str, new_path: str, name: str):
+def move_the_file(old_path: str, new_path: str, name: str) -> None:
     print('I move the file', name)
     print('from', old_path)
     print('to', new_path)
@@ -231,6 +229,7 @@ def move_the_file(old_path: str, new_path: str, name: str):
         os.makedirs(new_path_for_the_folder)
     try:
         shutil.move(old_path, new_path)
+        return None
     except Exception as err:
         print('move error', name)
         print(f"Unexpected {err=}, {type(err)=}")
@@ -279,7 +278,7 @@ def move_from_checked_to_to_send(file: ClassFile, protocol: str = ''):
     file.status = StatusFile.to_send
 
 
-def move_the_file_to_new_protocol(file: ClassFile, new_protocol: int):
+def move_the_file_to_new_protocol(file: ClassFile, new_protocol: str):
     match file.status:
         case StatusFile.by_checking:
             list_of_status = [StatusFile.by_checking]
@@ -294,7 +293,7 @@ def move_the_file_to_new_protocol(file: ClassFile, new_protocol: int):
                                                   status=status)
 
 
-def move_the_file_to_new_protocol_with_status(file: ClassFile, new_protocol: int, status: str):
+def move_the_file_to_new_protocol_with_status(file: ClassFile, new_protocol: str, status: str):
     old_protocol = variables.protocol + ' ' + str(file.nr_protokol)
     match status:
         case StatusFile.by_checking:
@@ -309,10 +308,10 @@ def move_the_file_to_new_protocol_with_status(file: ClassFile, new_protocol: int
                                   status_path=status_path)
 
 
-def move_the_file_with_the_status(file: ClassFile, new_protocol: int, status_path: str, old_protocol: str):
+def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_path: str, old_protocol: str):
     new_part = variables.checked_files + '\\' + status_path + '\\' + old_protocol
     old_path = file.path.replace(variables.incoming_docs, new_part)
-    new_part = variables.checked_files + '\\' + status_path + '\\' + new_protocol
+    new_part = variables.checked_files + '\\' + status_path + '\\' + str(new_protocol)
     new_path = file.path.replace(variables.incoming_docs, new_part)
     move_the_file(old_path=old_path, new_path=new_path, name=file.name)
 
@@ -335,7 +334,7 @@ def open_the_file(file: ClassFile):
 
 
 def get_list_of_file_in_the_protocol(list_of_all_files: list[ClassFile], number_of_current_protocol: int,
-                                     current_dir_incoming_docs: str) ->  [ClassFile]:
+                                     current_dir_incoming_docs: str) ->  list[ClassFile]|None:
     list_of_file_in_protocol = []
     for file in list_of_all_files:
         if file.nr_protokol == number_of_current_protocol:
@@ -356,7 +355,7 @@ def get_list_of_file_in_the_protocol(list_of_all_files: list[ClassFile], number_
     return get_new_list_of_files_in_the_protocol(dict_files=dict_files, list_of_files=list_of_file_in_protocol)
 
 
-def get_new_list_of_files_in_the_protocol(dict_files: dict[str], list_of_files: list[ClassFile]) -> [ClassFile]:
+def get_new_list_of_files_in_the_protocol(dict_files: dict[str:str], list_of_files: list[ClassFile]) -> list[ClassFile]:
     new_list_of_file = []
     dict_of_names = dict()
     for file_table in dict_files:
@@ -368,7 +367,7 @@ def get_new_list_of_files_in_the_protocol(dict_files: dict[str], list_of_files: 
             index = file_table[index + 7:].replace(" ", "")
             if index == '-':
                 index = ''
-        except :
+        except ValueError:
             file_name = file_table
             index = ''
         value = dict_files[file_table]
@@ -393,25 +392,23 @@ def get_new_list_of_files_in_the_protocol(dict_files: dict[str], list_of_files: 
     return new_list_of_file
 
 
-def file_excel_open_get_date(file_name: str) -> dict[str] | None:
+def file_excel_open_get_date(file_name: str) -> dict[str:str] | None:
     with (open(file_name, "rb") as f):
         try:
             in_mem_file = io.BytesIO(f.read())
         except FileExistsError:
             print('can not open the file')
             return None
-        print(file_name)
+        print("open the excel file ", file_name)
         work_book = openpyxl.load_workbook(in_mem_file, read_only=True)
-        print(work_book)
-        print(work_book.sheetnames)
+        print("read the work_book ", work_book)
+        print("with the sheetnames ", work_book.sheetnames)
         sheet = work_book.active
 
         column = 1
         while sheet.cell(row=1, column=column).value is not None:
             value = sheet.cell(row=1, column=column).value
-            print(column, value)
             if value == variables.name_of_the_useful_cell_in_the_excel_file:
-                print("cell number = ", value)
                 break
             column+=1
 
@@ -425,3 +422,4 @@ def file_excel_open_get_date(file_name: str) -> dict[str] | None:
             dict_files[name_index] = value
         work_book.close()
     return dict_files
+
