@@ -1,6 +1,6 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2025",
-    "project": "P25-024_Funk Oberkirch Neub. Stadtquartier Untere Linde Oberkirch",
+    "year": "P-2024",
+    "project": "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen",
     "show_static": false
 }

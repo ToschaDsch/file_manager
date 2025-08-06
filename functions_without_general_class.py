@@ -2,7 +2,7 @@ import io
 import os
 import shutil
 from typing import Any
-
+import json
 import openpyxl
 
 import variables
@@ -423,3 +423,44 @@ def file_excel_open_get_date(file_name: str) -> dict[str:str] | None:
         work_book.close()
     return dict_files
 
+
+def read_the_setting_from_the_file(path: str) -> dict[str:str]|None:
+    try:
+        # Open and read the file
+        with open(path, 'r') as file:
+            content = file.read()
+        # Try to parse the content as JSON
+        try:
+            data_dict = json.loads(content)
+            print("JSON data successfully parsed as dictionary:")
+            print(data_dict)
+            return {'dir_for_checking': data_dict['dir_for_checking'],
+                    'year': data_dict['year'],
+                    'project': data_dict['project'],
+                    'show_static': data_dict['show_static']}
+        except json.JSONDecodeError:
+            print("The file content is not valid JSON.")
+            return None
+    except Exception as e:
+        print(f"Error reading the file: {e}")
+        return None
+
+def make_default_settings(path: str) -> dict[str:str]|None:
+    print(f"The file does not exist at: {path}")
+    dir_0 = variables.dir_for_checking
+    raw_list_of_all_folder = os.listdir(dir_0)
+    list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+    current_year = list_of_years[-1]
+    current_list_of_files_for_the_year: list[str] = get_only_folders(path=dir_0 + '\\' + current_year)
+    project = current_list_of_files_for_the_year[0]
+    settings_0 = {'dir_for_checking': variables.dir_for_checking,
+                  'year': current_year,
+                  'project': project,
+                  'show_static': False}
+    try:
+        with open(path, 'w') as file:
+            json.dump(settings_0, file, indent=4)
+        print(f"Dictionary saved as JSON to '{path}'.")
+    except Exception as e:
+        print(f"Failed to save JSON: {e}")
+    return settings_0

@@ -217,6 +217,7 @@ class GeneralWindow(QMainWindow):
         print('list of files for ', self._current_protocol)
         for file in list_of_file_in_protocol:
             print(file.print_values)
+        return None
 
     def make_list_of_protocols(self):
         self.combobox_protocol.clear()
@@ -274,6 +275,7 @@ class GeneralWindow(QMainWindow):
                 else:
                     move_from_checked_to_to_send(file=file, protocol=protocol)
         file.nr_protokol = int(self._last_two_numbers_of_current_protocol)
+        return None
 
     def check_can_i_move_it(self, status: str) -> bool:
         """the function checks - can you move the file,
