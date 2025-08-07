@@ -122,7 +122,7 @@ class GeneralWindow(QMainWindow):
 
         separator = QLabel('  ')
         separator.setFixedWidth(VariablesForMenus.separator_for_menu_bottom)
-        layout_bottom.addWidget(separator)
+        #layout_bottom.addWidget(separator)
 
         self.button_to_move.setEnabled(False)
         self.button_to_move.clicked.connect(self.move_the_picked_files)

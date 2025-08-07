@@ -1,59 +1,59 @@
 from dataclasses import dataclass
 
-name_of_the_program = 'file_manager_'
-file_of_settings = 'settings.txt'
-current_year = 'P-2024'
-current_project = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
+name_of_the_program: str = 'file_manager_'
+file_of_settings: str = 'settings.txt'
+current_year: str = 'P-2024'
+current_project: str = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 
-dir_for_checking = 'V:\\'
-name_of_the_folder = 'P-20'
-incoming_docs = 'Eingang Prüfunterlagen'
-checked_files = 'geprüfte Unterlagen'
-by_checking = '0_Pläne zu prüfen'
-checked_files_planes = '1_geprüfte Pläne'
-files_to_send = '2_Pläne zu schicken'
-file_name_not_to_scan = {by_checking, checked_files_planes, files_to_send,
+dir_for_checking: str = 'V:\\'
+name_of_the_folder: str = 'P-20'
+incoming_docs: str = 'Eingang Prüfunterlagen'
+checked_files: str = 'geprüfte Unterlagen'
+by_checking: str = '0_Pläne zu prüfen'
+checked_files_planes: str = '1_geprüfte Pläne'
+files_to_send: str = '2_Pläne zu schicken'
+file_name_not_to_scan: set[str] = {by_checking, checked_files_planes, files_to_send,
                          'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
-folder_that_i_dont_need = ['überholt', 'Überholt', 'überholte Pläne']   #
-folder_that_i_dont_need_with_statik = ['Statik', 'statik']
-variants_of_the_ending = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
-names_of_protocol = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
-protocol = 'Prüfbericht'
-list_of_aims = [by_checking, checked_files_planes, files_to_send]
-text_of_the_excel_file = 'Verlauf'
-text_index = ' Index '
-name_of_the_useful_cell_in_the_excel_file = "Inhalt"
+folder_that_i_dont_need: list[str] = ['überholt', 'Überholt', 'überholte Pläne']   #
+folder_that_i_dont_need_with_statik: list[str] = ['Statik', 'statik']
+variants_of_the_ending: set[str] = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
+names_of_protocol: set[str] = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
+protocol: str = 'Prüfbericht'
+list_of_aims: list[str] = [by_checking, checked_files_planes, files_to_send]
+text_of_the_excel_file: str = 'Verlauf'
+text_index: str = ' Index '
+name_of_the_useful_cell_in_the_excel_file: str = "Inhalt"
 
 
 @dataclass
 class VariablesForMenus:
     # size of the general windows
-    b = 700
-    h = 600
+    b: int = 700
+    h: int = 600
 
     table_insert = False
 
-    screen_width = 100
-    screen_height = 100
-    general_window = None
+    screen_width: int = 100
+    screen_height: int = 100
+    general_window: int = None
     # width to general table
-    column_0_name = 350
-    column_1_status = 100
-    column_2_protokol = 100
-    column_3_subdir = 100
+    column_0_name: int = 350
+    column_1_status: int = 100
+    column_2_protokol: int = 100
+    column_3_subdir: int = 100
     # menu at the bottom
-    separator_for_menu_bottom = 30
-    text_for_button_move_file = 'den Plan kopieren nach ->'
-    text_for_button_open = 'die Pläne öffnen'
-    open_list_of_files_in_the_protocol = 'Liste der Pläne im Prüfbericht'
-    text_show_static = "zeige Statik"
-    text_move_the_file = 'Verschieben die Pläne zum Prüfbericht'
+    separator_for_menu_bottom: int = 10
+    text_for_button_move_file: str = 'den Plan kopieren nach ->'
+    text_for_button_open: str = 'die Pläne öffnen'
+    open_list_of_files_in_the_protocol: str = 'Liste der Pläne im Prüfbericht'
+    text_show_static: str = "zeige Statik"
+    text_move_the_file: str = 'Verschieben die Pläne zum Prüfbericht'
 
 
 @dataclass
 class MyColor:
-    unchecked = (250, 100, 100)
-    by_checking = (150, 100, 100)
-    checked = (150, 150, 100)
-    to_send = (100, 150, 100)
-    is_send = (100, 100, 150)
+    unchecked: tuple[int] = (250, 100, 100)
+    by_checking: tuple[int] = (150, 100, 100)
+    checked: tuple[int] = (150, 150, 100)
+    to_send: tuple[int] = (100, 150, 100)
+    is_send: tuple[int] = (100, 100, 150)
