@@ -429,7 +429,6 @@ class GeneralWindow(QMainWindow):
                 number = name_of_current_protocol[i: i + 2]
                 self._last_two_numbers_of_current_protocol = number
                 break
-            return None
         return None
 
     def change_index_of_combobox_year(self, index: int):
@@ -482,13 +481,15 @@ class GeneralWindow(QMainWindow):
         for folder_i in list_of_folders:
             dir_i = self._current_dir_incoming_docs + '\\' + folder_i
             for file in os.listdir(dir_i):
-                if file.endswith(".pdf"):
-                    self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), folder_i])
+                for end_of_the_file  in variables.types_of_the_draw_files:
+                    if file.endswith(end_of_the_file):
+                        self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), folder_i])
         # files without folders
         dir_i = self._current_dir_incoming_docs
         for file in os.listdir(dir_i):
-            if file.endswith(".pdf"):
-                self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
+            for end_of_the_file  in variables.types_of_the_draw_files:
+                if file.endswith(end_of_the_file):
+                    self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
         # list of all send files
         self._dict_by_checking_files = get_dict_of_by_checking_files(path=self._current_dir_project)
         self._dict_checked_files = get_dict_of_checked_files(path=self._current_dir_project,

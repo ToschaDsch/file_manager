@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 
+from PySide6.QtWidgets import QMainWindow
+
 name_of_the_program: str = 'file_manager_'
 file_of_settings: str = 'settings.txt'
 current_year: str = 'P-2024'
 current_project: str = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 
+types_of_the_draw_files = (".pdf", ".PDF")
 dir_for_checking: str = 'V:\\'
 name_of_the_folder: str = 'P-20'
 incoming_docs: str = 'Eingang Prüfunterlagen'
@@ -35,7 +38,7 @@ class VariablesForMenus:
 
     screen_width: int = 100
     screen_height: int = 100
-    general_window: int = None
+    general_window: QMainWindow = None
     # width to general table
     column_0_name: int = 350
     column_1_status: int = 100
