@@ -11,8 +11,10 @@ from class_file import StatusFile, ClassFile
 
 def get_list_of_all_protocols(dir_protocols: str) -> tuple[list[Any] | list[str], list[Any]]:
     all_files = get_only_files(path=dir_protocols)
-    docx_files = {x[:-5] for x in all_files if x[-5:] == '.docx'}
-    doc_files = {x[:-4] for x in all_files if x[-4:] == '.doc'}
+    doc = variables.types_of_the_protocol_files[0]
+    docx = variables.types_of_the_protocol_files[1]
+    doc_files = {x[:-len(doc)] for x in all_files if x[-len(doc):] == doc}
+    docx_files = {x[:-len(docx)] for x in all_files if x[-len(docx):] == docx}
     filter_files = doc_files | docx_files
     filter_files_2 = set()
     for variant_of_protocol in variables.names_of_protocol:

@@ -12,7 +12,8 @@ from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_of_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
-    get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol
+    get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, get_only_files, \
+    start_the_file
 from variables import VariablesForMenus
 
 
@@ -82,7 +83,7 @@ class GeneralWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def changeEvent(self, event):
-        if event.type() == QEvent.ActivationChange:
+        if event.type() == QEvent.Type.ActivationChange:
             if self.isActiveWindow():
                 self.on_application_activated()
         super().changeEvent(event)
@@ -146,6 +147,10 @@ class GeneralWindow(QMainWindow):
         self.make_list_of_protocols()
         layout_bottom.addWidget(self.combobox_protocol)
 
+        button_open_the_protocol = QPushButton(VariablesForMenus.open_the_protocol)
+        button_open_the_protocol.clicked.connect(self.open_the_protokol)
+        layout_bottom.addWidget(button_open_the_protocol)
+
         self.button_move_the_file_to_the_protocol.clicked.connect(self.move_the_file_to_the_protocol)
         layout_bottom.addWidget(self.button_move_the_file_to_the_protocol)
         self.button_move_the_file_to_the_protocol.setEnabled(False)
@@ -154,6 +159,24 @@ class GeneralWindow(QMainWindow):
         self.button_to_open_list_of_protocols.clicked.connect(self.show_the_files_in_the_protocol)
 
         layout.addLayout(layout_bottom)
+
+    def open_the_protokol(self):
+        """the function opens the current protocol"""
+        all_files = get_only_files(path=self._current_dir_project)
+        variants_of_the_name: list[str] = []
+        for variant in variables.names_of_protocol:
+            variants_of_the_name.append(self._current_protocol.replace(variables.protocol, variant))
+        for name in variants_of_the_name.copy():
+            variants_of_the_name.append(self._current_project[:7] + " " + name)
+        for name_i in variants_of_the_name:
+            for type_of_the_file in variables.types_of_the_protocol_files:
+                name_of_the_file = name_i + type_of_the_file
+                if name_of_the_file in all_files:
+                    file_path = self._current_dir_project + "\\" + name_of_the_file
+                    print(file_path)
+                    start_the_file(path=file_path)
+                    return None
+        return None
 
     def move_the_file_to_the_protocol(self):
         current_protocol = int(self._last_two_numbers_of_current_protocol)
@@ -193,7 +216,7 @@ class GeneralWindow(QMainWindow):
         layout_palette = QHBoxLayout()
         for name_of_label, color in StatusFile.dict_of_palette_colors.items():
             label_i = QLabel(name_of_label + ' ->')
-            label_i.setAlignment(Qt.AlignCenter)
+            label_i.setAlignment(Qt.AlignmentFlag.AlignCenter)
             color_i = f"background-color:{color}"
             label_i.setFixedHeight(20)
             label_i.setStyleSheet(color_i)
@@ -227,12 +250,14 @@ class GeneralWindow(QMainWindow):
         n = 0
         for i, protocol_i in enumerate(self._list_of_protocols):
             self.combobox_protocol.addItem(str(protocol_i))
-            model.setData(model.index(i, 0), QColor(*variables.MyColor.checked), QtCore.Qt.BackgroundRole)
+            model.setData(model.index(i, 0), QColor(*variables.MyColor.checked),
+                          QtCore.Qt.ItemDataRole.BackgroundRole)
             n = i
 
         for i, protocol_i in enumerate(self._list_send_protocols):
             self.combobox_protocol.addItem(str(protocol_i))
-            model.setData(model.index(n + i + 1, 0), QColor(*variables.MyColor.is_send), QtCore.Qt.BackgroundRole)
+            model.setData(model.index(n + i + 1, 0), QColor(*variables.MyColor.is_send),
+                          QtCore.Qt.ItemDataRole.BackgroundRole)
 
         current_index = 0
         self.combobox_protocol.currentIndexChanged.connect(self.change_index_of_combobox_protocol)
@@ -400,13 +425,13 @@ class GeneralWindow(QMainWindow):
         # b0
         self.general_table.setItem(row_number, 0, QTableWidgetItem(str(new_element.name[:-4])))
         item_status = QLabel(new_element.status)
-        item_status.setAlignment(Qt.AlignCenter)
+        item_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         color = StatusFile.dict_of_palette_colors[new_element.status]
         color_i = f"background-color:{color}"
         item_status.setStyleSheet(color_i)
         self.general_table.setCellWidget(row_number, 1, item_status)
         protocol_widget = QTableWidgetItem(str(new_element.nr_protokol))
-        protocol_widget.setTextAlignment(Qt.AlignCenter)
+        protocol_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         self.general_table.setItem(row_number, 2, protocol_widget)
         self.general_table.setItem(row_number, 3, QTableWidgetItem(new_element.subdir))
         VariablesForMenus.table_insert = False

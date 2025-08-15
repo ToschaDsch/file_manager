@@ -8,6 +8,7 @@ current_year: str = 'P-2024'
 current_project: str = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 
 types_of_the_draw_files = (".pdf", ".PDF")
+types_of_the_protocol_files = ('.doc', '.docx')
 dir_for_checking: str = 'V:\\'
 name_of_the_folder: str = 'P-20'
 incoming_docs: str = 'Eingang Prüfunterlagen'
@@ -49,6 +50,7 @@ class VariablesForMenus:
     text_for_button_move_file: str = 'den Plan kopieren nach ->'
     text_for_button_open: str = 'die Pläne öffnen'
     open_list_of_files_in_the_protocol: str = 'Liste der Pläne im Prüfbericht'
+    open_the_protocol: str = "öffnen den Prüfbericht"
     text_show_static: str = "zeige Statik"
     text_move_the_file: str = 'Verschieben die Pläne zum Prüfbericht'
 
