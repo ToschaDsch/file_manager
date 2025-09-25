@@ -13,7 +13,7 @@ from functions_without_general_class import open_the_file, check_the_file, get_d
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
     get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, get_only_files, \
-    start_the_file
+    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox
 from variables import VariablesForMenus
 
 
@@ -66,6 +66,14 @@ class GeneralWindow(QMainWindow):
         list_of_files = self._list_of_years
         self.make_top_menu(layout=general_layout, list_of_dir=list_of_files)
 
+        # menu up 2 (my projects
+        self.combobox_my_projects = QComboBox()
+        self.button_delete_the_project = QPushButton()
+        self.button_add_the_project = QPushButton()
+        self.dict_of_my_projects = variables.my_projects
+        self.meke_top_menu_2(layout=general_layout,
+                             dict_of_my_projects=self.dict_of_my_projects)
+
         # middle menu
         self.make_menu_middle(layout=general_layout, list_of_dir=list_of_files)
 
@@ -98,7 +106,8 @@ class GeneralWindow(QMainWindow):
         settings_0 = {'dir_for_checking': variables.dir_for_checking,
                       'year': variables.current_year,
                       'project': self._current_project,
-                      'show_static': self._show_static}
+                      'show_static': self._show_static,
+                      'my_projects': self.dict_of_my_projects}
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -363,6 +372,45 @@ class GeneralWindow(QMainWindow):
         for dir_i in self._current_list_of_files_for_the_year:
             self.combobox_dir_project.addItem(str(dir_i))
         self.combobox_dir_project.currentIndexChanged.connect(self.change_index_of_combobox_project)
+
+    def meke_top_menu_2(self, layout: QVBoxLayout, dict_of_my_projects: dict[str]):
+        # make the menu for my projects
+        layout_my_projects = QHBoxLayout()
+        layout_my_projects.addWidget(QLabel(VariablesForMenus.my_projects))
+        # buttons
+        layout_my_projects.addWidget(self.button_add_the_project)
+        layout_my_projects.addWidget(self.button_delete_the_project)
+        path = variables.path_buttons_my_projects_plus
+        h = variables.VariablesForMenus.height_buttons
+        b = VariablesForMenus.width_buttons
+        make_a_buton_with_a_picture(path_for_the_pis=path, h=h, b=b,
+                                    button=self.button_add_the_project,
+                                    function=self.add_the_project_to_my_project)
+        path = variables.path_buttons_my_projects_delete
+        make_a_buton_with_a_picture(path_for_the_pis=path, h=h, b=b,
+                                    button=self.button_delete_the_project,
+                                    function=self.delete_the_project_from_my_project)
+        # combobox
+        layout_my_projects.addWidget(self.combobox_my_projects)
+        new_list_to_the_combobox(combobox=self.combobox_my_projects,
+                                 dict_of_my_projects=dict_of_my_projects,
+                                 current_project=self._current_project)
+
+        layout.addLayout(layout_my_projects)
+
+    def add_the_project_to_my_project(self):
+        self.dict_of_my_projects[self._current_project] = self._current_dir_project
+        new_list_to_the_combobox(combobox=self.combobox_my_projects,
+                                 dict_of_my_projects=self.dict_of_my_projects,
+                                 current_project=self._current_project)
+
+    def delete_the_project_from_my_project(self):
+        current_project = self.combobox_my_projects.currentText()
+        if current_project in self.dict_of_my_projects:
+            del self.dict_of_my_projects[current_project]
+        new_list_to_the_combobox(combobox=self.combobox_my_projects,
+                                 dict_of_my_projects=self.dict_of_my_projects,
+                                 current_project=self._current_project)
 
     def table_selection_changed(self):
         if VariablesForMenus.table_insert:

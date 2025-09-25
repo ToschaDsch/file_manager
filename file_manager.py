@@ -36,6 +36,10 @@ def set_the_settings() -> bool:
     variables.current_year = settings['year']
     variables.current_project = settings['project']
     show_me_static = settings['show_static']
+    if 'my_projects' in settings:
+        variables.my_projects = settings['my_projects']
+    else:
+        variables.my_projects = dict()
     return show_me_static
 
 if __name__ == "__main__":

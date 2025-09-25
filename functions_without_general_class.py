@@ -4,10 +4,35 @@ import shutil
 from typing import Any
 import json
 import openpyxl
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QPixmap, Qt
+from PySide6.QtWidgets import QPushButton, QComboBox
 
 import variables
 from class_file import StatusFile, ClassFile
 
+def new_list_to_the_combobox(combobox: QComboBox, dict_of_my_projects: dict,
+                             current_project: str) -> None:
+    print(current_project)
+    combobox.clear()
+    for key, value in dict_of_my_projects.items():
+        combobox.addItem(key)
+    combobox.setCurrentText(current_project)
+
+def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
+                                button: QPushButton, function):
+    pixmap = QPixmap(path_for_the_pis)
+    if pixmap.isNull():
+        print("no picture", path_for_the_pis)
+
+    new_size = QSize(h, h)
+    scaled = pixmap.scaled(new_size,
+                           Qt.AspectRatioMode.KeepAspectRatio,
+                           Qt.TransformationMode.SmoothTransformation)
+    button.setIcon(scaled)
+    button.setIconSize(new_size)
+    button.setFixedWidth(b)
+    button.clicked.connect(function)
 
 def get_list_of_all_protocols(dir_protocols: str) -> tuple[list[Any] | list[str], list[Any]]:
     all_files = get_only_files(path=dir_protocols)
@@ -25,11 +50,11 @@ def get_list_of_all_protocols(dir_protocols: str) -> tuple[list[Any] | list[str]
                 filter_files_2.add(file_filter_name)
     send_protocols = []
     not_send_protocols = []
-    for protokol_i in filter_files_2:
-        if protokol_i.isnumeric():
-            send_protocols.append(variables.protocol + '_' + protokol_i)
+    for protocol_i in filter_files_2:
+        if protocol_i.isnumeric():
+            send_protocols.append(variables.protocol + '_' + protocol_i)
         else:
-            not_send_protocols.append(variables.protocol + protokol_i)
+            not_send_protocols.append(variables.protocol + protocol_i)
     if len(not_send_protocols) == 0:
         not_send_protocols = [variables.protocol + '_' + '00']
     return not_send_protocols, send_protocols

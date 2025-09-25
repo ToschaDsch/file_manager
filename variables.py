@@ -6,11 +6,15 @@ name_of_the_program: str = 'file_manager_'
 file_of_settings: str = 'settings.txt'
 current_year: str = 'P-2024'
 current_project: str = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
+my_projects: dict = dict()
 
 types_of_the_draw_files = (".pdf", ".PDF")
 types_of_the_protocol_files = ('.doc', '.docx')
 dir_for_checking: str = 'V:\\'
 name_of_the_folder: str = 'P-20'
+
+path_buttons_my_projects_plus: str = './/icos//plus.png'
+path_buttons_my_projects_delete: str = './/icos//trash.png'
 incoming_docs: str = 'Eingang Prüfunterlagen'
 checked_files: str = 'geprüfte Unterlagen'
 by_checking: str = '0_Pläne zu prüfen'
@@ -53,6 +57,10 @@ class VariablesForMenus:
     open_the_protocol: str = "öffnen den Prüfbericht"
     text_show_static: str = "zeige Statik"
     text_move_the_file: str = 'Verschieben die Pläne zum Prüfbericht'
+    # menu my projects
+    my_projects: str = "Meine Projekte"
+    height_buttons: int = 20
+    width_buttons: int = 40
 
 
 @dataclass

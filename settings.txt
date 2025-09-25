@@ -1,6 +1,7 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2025",
-    "project": "P25-068_Nawrot Erw. im EG+OG L\u00f6rrach",
-    "show_static": true
+    "year": "P-2024",
+    "project": "P24-094_H\u00fcgel Immobilien MFH mit TG Endingen",
+    "show_static": false,
+    "my_projects": {}
 }
