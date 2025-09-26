@@ -28,7 +28,7 @@ class GeneralWindow(QMainWindow):
         dir_0 = variables.dir_for_checking
         raw_list_of_all_folder = os.listdir(dir_0)
         self._list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
-        self._current_year = variables.current_year
+        self._current_year: str = variables.current_year
         self._current_dir_year = variables.dir_for_checking + '\\' + variables.current_year
         self._current_list_of_files_for_the_year = []
         self._current_project = variables.current_project
@@ -45,7 +45,7 @@ class GeneralWindow(QMainWindow):
 
         self._picked_files = []
         self._current_aim_to_move = StatusFile.list_of_status[0]
-        self._list_of_protocols = [0]
+        self._list_of_protocols: list[str] = []
         self._current_protocol = ''
         self._list_send_protocols = []
         self._number_of_current_protocol = 0
@@ -71,14 +71,15 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self._dict_of_my_projects = {'-':0}
+        self._dict_of_my_projects = {"-":{'year': None,
+                                        'status': None}}
         self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
 
         self.make_top_menu_2(layout=general_layout,
                              dict_of_my_projects=self._dict_of_my_projects)
 
         # middle menu
-        self.make_menu_middle(layout=general_layout, list_of_dir=list_of_files)
+        self.make_menu_middle(layout=general_layout)
 
         # menus at the bottom
         self.button_to_move = QPushButton(VariablesForMenus.text_for_button_move_file)
@@ -333,7 +334,7 @@ class GeneralWindow(QMainWindow):
         nr_aim = StatusFile.dict_of_status[self._current_aim_to_move]
         return nr_status < nr_aim
 
-    def make_menu_middle(self, layout: QVBoxLayout, list_of_dir):
+    def make_menu_middle(self, layout: QVBoxLayout):
         # make the table
         header = ('name', 'status', 'Nr. Prüfbericht', 'directory')
         b = VariablesForMenus.b
@@ -414,7 +415,7 @@ class GeneralWindow(QMainWindow):
 
     def change_index_of_combobox_my_projects(self, index: int):
         current_project = self.combobox_my_projects.currentText()
-        if current_project in ("", '-'):
+        if current_project in ("", '-', None):
             return None
         self._current_project = current_project
         self._current_year = self._dict_of_my_projects[current_project]['year']
