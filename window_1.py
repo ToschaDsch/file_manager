@@ -28,6 +28,7 @@ class GeneralWindow(QMainWindow):
         dir_0 = variables.dir_for_checking
         raw_list_of_all_folder = os.listdir(dir_0)
         self._list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+        self._current_year = variables.current_year
         self._current_dir_year = variables.dir_for_checking + '\\' + variables.current_year
         self._current_list_of_files_for_the_year = []
         self._current_project = variables.current_project
@@ -70,9 +71,11 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self.dict_of_my_projects = variables.my_projects
-        self.meke_top_menu_2(layout=general_layout,
-                             dict_of_my_projects=self.dict_of_my_projects)
+        self._dict_of_my_projects = {'-':0}
+        self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
+
+        self.make_top_menu_2(layout=general_layout,
+                             dict_of_my_projects=self._dict_of_my_projects)
 
         # middle menu
         self.make_menu_middle(layout=general_layout, list_of_dir=list_of_files)
@@ -85,6 +88,11 @@ class GeneralWindow(QMainWindow):
         self.combobox_aim_to_move = QComboBox()
         self.combobox_protocol = QComboBox()
         self.make_menu_bottom(layout=general_layout)
+
+        self.combobox_dir_year.setCurrentText(variables.current_year)
+        self.refresh_all()
+        self.combobox_dir_project.setCurrentText(variables.current_project)
+        self.combobox_my_projects.setCurrentIndex(0)
 
         widget = QWidget()
         widget.setLayout(general_layout)
@@ -107,7 +115,7 @@ class GeneralWindow(QMainWindow):
                       'year': variables.current_year,
                       'project': self._current_project,
                       'show_static': self._show_static,
-                      'my_projects': self.dict_of_my_projects}
+                      'my_projects': self._dict_of_my_projects}
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -281,7 +289,7 @@ class GeneralWindow(QMainWindow):
 
     def move_the_file(self, file: ClassFile):
         # check - can I move it
-        if self.check_can_i_move_it(status=file.status) is False:
+        if not self.check_can_i_move_it(status=file.status):
             return None
         # V:\P-2024\P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen\Eingang Prüfunterlagen\Pläne Haus
         # 1\P24-117_BEW_H1-BU104_-_BA1_UG_UP20602.pdf if self._number_of_current_protocol
@@ -342,7 +350,11 @@ class GeneralWindow(QMainWindow):
         self.general_table.itemDoubleClicked.connect(self.double_click_the_table_item)
         layout.addWidget(self.general_table)
 
-        index = self._current_list_of_files_for_the_year.index(variables.current_project)
+        try:
+            index = self._current_list_of_files_for_the_year.index(variables.current_project)
+        except ValueError:
+            print('There is no file for this year - ', variables.current_project)
+            index = 0
         self.combobox_dir_project.setCurrentIndex(index)
 
     def make_top_menu(self, layout: QVBoxLayout, list_of_dir):
@@ -373,7 +385,7 @@ class GeneralWindow(QMainWindow):
             self.combobox_dir_project.addItem(str(dir_i))
         self.combobox_dir_project.currentIndexChanged.connect(self.change_index_of_combobox_project)
 
-    def meke_top_menu_2(self, layout: QVBoxLayout, dict_of_my_projects: dict[str]):
+    def make_top_menu_2(self, layout: QVBoxLayout, dict_of_my_projects: dict):
         # make the menu for my projects
         layout_my_projects = QHBoxLayout()
         layout_my_projects.addWidget(QLabel(VariablesForMenus.my_projects))
@@ -395,22 +407,40 @@ class GeneralWindow(QMainWindow):
         new_list_to_the_combobox(combobox=self.combobox_my_projects,
                                  dict_of_my_projects=dict_of_my_projects,
                                  current_project=self._current_project)
+        self.combobox_my_projects.currentIndexChanged.connect(self.change_index_of_combobox_my_projects)
 
         layout.addLayout(layout_my_projects)
 
+
+    def change_index_of_combobox_my_projects(self, index: int):
+        current_project = self.combobox_my_projects.currentText()
+        if current_project in ("", '-'):
+            return None
+        self._current_project = current_project
+        self._current_year = self._dict_of_my_projects[current_project]['year']
+        self.combobox_dir_year.setCurrentText(self._current_year)
+        self.refresh_all()
+        self.combobox_dir_project.setCurrentText(self._current_project)
+        return None
+
     def add_the_project_to_my_project(self):
-        self.dict_of_my_projects[self._current_project] = self._current_dir_project
+        self._dict_of_my_projects[self._current_project] = {'year':self._current_year,
+                                                            'status': None}
         new_list_to_the_combobox(combobox=self.combobox_my_projects,
-                                 dict_of_my_projects=self.dict_of_my_projects,
+                                 dict_of_my_projects=self._dict_of_my_projects,
                                  current_project=self._current_project)
 
     def delete_the_project_from_my_project(self):
+
         current_project = self.combobox_my_projects.currentText()
-        if current_project in self.dict_of_my_projects:
-            del self.dict_of_my_projects[current_project]
+        if current_project == "-":
+            return None
+        if current_project in self._dict_of_my_projects:
+            del self._dict_of_my_projects[current_project]
         new_list_to_the_combobox(combobox=self.combobox_my_projects,
-                                 dict_of_my_projects=self.dict_of_my_projects,
+                                 dict_of_my_projects=self._dict_of_my_projects,
                                  current_project=self._current_project)
+        return None
 
     def table_selection_changed(self):
         if VariablesForMenus.table_insert:
@@ -457,13 +487,12 @@ class GeneralWindow(QMainWindow):
         if StatusFile.unchecked in set_of_status:
             status = StatusFile.unchecked
         # find new aim
+        index = 3
         match status:
             case StatusFile.unchecked:
                 index = 1
             case StatusFile.by_checking:
                 index = 2
-            case _:
-                index = 3
         self._current_aim_to_move = StatusFile.list_of_status[index]
         self.combobox_aim_to_move.setCurrentIndex(index - 1)
 
@@ -505,9 +534,9 @@ class GeneralWindow(QMainWindow):
         return None
 
     def change_index_of_combobox_year(self, index: int):
-        current_year = self._list_of_years[index]
-        self._current_dir_year = variables.dir_for_checking + '\\' + current_year
-        variables.current_year = current_year
+        self._current_year = self._list_of_years[index]
+        self._current_dir_year = variables.dir_for_checking + '\\' + self._current_year
+        variables.current_year = self._current_year
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = self._current_list_of_files_for_the_year[0]
         self._current_dir_project = self._current_dir_year + '\\' + self._current_project

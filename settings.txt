@@ -1,7 +1,24 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2024",
-    "project": "P24-094_H\u00fcgel Immobilien MFH mit TG Endingen",
+    "year": "P-2025",
+    "project": "P25-059_S. Tofaj Dachgeschossausbau Chrischonastr. 13 L\u00d6",
     "show_static": false,
-    "my_projects": {}
+    "my_projects": {
+        "P25-065_Winterhalter-Hauptstr-Elzach": {
+            "year": "P-2025",
+            "status": null
+        },
+        "P25-059_S. Tofaj Dachgeschossausbau Chrischonastr. 13 L\u00d6": {
+            "year": "P-2025",
+            "status": null
+        },
+        "P24-006_Hartmann Erw. + Umb. Metzgerei Wolfenweiler": {
+            "year": "P-2024",
+            "status": null
+        },
+        "P24-125_GEWO-Stuckert 2 MFH in Waldkirch": {
+            "year": "P-2024",
+            "status": null
+        }
+    }
 }
