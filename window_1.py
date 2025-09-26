@@ -42,6 +42,7 @@ class GeneralWindow(QMainWindow):
         self._dict_to_send_files = dict()
         self._set_send_files = {}
         self._selected_rows: list[int] = list()
+        self._unchecked_files = 0
 
         self._picked_files = []
         self._current_aim_to_move = StatusFile.list_of_status[0]
@@ -71,8 +72,8 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self._dict_of_my_projects = {"-":{'year': None,
-                                        'status': None}}
+        self._dict_of_my_projects: dict[str, dict[str, str|None]] = {"-":{'year': None,
+                                                                        'status': None}}
         self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
 
         self.make_top_menu_2(layout=general_layout,
@@ -224,6 +225,10 @@ class GeneralWindow(QMainWindow):
         else:
             self._folder_that_i_dont_need = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
         self.refresh_all()
+        current_project = self._current_project
+        self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
+                                                  current_project=self._current_project)
+        self.make_the_project_active(project=current_project)
 
     def show_the_files_in_the_protocol(self):
         self.make_list_of_file_in_the_protocol()
@@ -405,34 +410,56 @@ class GeneralWindow(QMainWindow):
                                     function=self.delete_the_project_from_my_project)
         # combobox
         layout_my_projects.addWidget(self.combobox_my_projects)
-        new_list_to_the_combobox(combobox=self.combobox_my_projects,
-                                 dict_of_my_projects=dict_of_my_projects,
-                                 current_project=self._current_project)
+        self.new_list_to_the_combobox_my_projects(dict_of_my_projects=dict_of_my_projects,
+                                                    current_project=self._current_project)
         self.combobox_my_projects.currentIndexChanged.connect(self.change_index_of_combobox_my_projects)
 
         layout.addLayout(layout_my_projects)
 
 
     def change_index_of_combobox_my_projects(self, index: int):
-        current_project = self.combobox_my_projects.currentText()
+        current_project = list(self._dict_of_my_projects)[index]
         if current_project in ("", '-', None):
             return None
-        self._current_project = current_project
-        self._current_year = self._dict_of_my_projects[current_project]['year']
-        self.combobox_dir_year.setCurrentText(self._current_year)
-        self.refresh_all()
-        self.combobox_dir_project.setCurrentText(self._current_project)
+        self.make_the_project_active(project=current_project)
         return None
 
+
+    def make_the_project_active(self, project: str) -> int:
+        self._current_year = self._dict_of_my_projects[project]['year']
+        self.combobox_dir_year.setCurrentText(self._current_year)
+        self.refresh_all()
+        self._current_project = project
+        self.combobox_dir_project.setCurrentText(self._current_project)
+        return self._unchecked_files
+
     def add_the_project_to_my_project(self):
-        self._dict_of_my_projects[self._current_project] = {'year':self._current_year,
+        self._dict_of_my_projects[self._current_project] = {'year': self._current_year,
                                                             'status': None}
-        new_list_to_the_combobox(combobox=self.combobox_my_projects,
-                                 dict_of_my_projects=self._dict_of_my_projects,
-                                 current_project=self._current_project)
+        self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
+                                                    current_project=self._current_project)
+
+    def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: dict,
+                                 current_project: str) -> None:
+        self.combobox_my_projects.clear()
+        for key, value in dict_of_my_projects.items():
+            if key == "-":
+                self.combobox_my_projects.addItem(key)
+                continue
+            status = self.check_status_of_the_project(project=key)
+            value['status'] = status
+            string = key + '    |   ' + status if status else key
+            self.combobox_my_projects.addItem(string)
+        self.combobox_my_projects.setCurrentText(current_project)
+
+    def check_status_of_the_project(self, project: str) -> str|None:
+
+        if self.make_the_project_active(project=project):
+            return variables.new_plans
+        else:
+            return None
 
     def delete_the_project_from_my_project(self):
-
         current_project = self.combobox_my_projects.currentText()
         if current_project == "-":
             return None
@@ -562,6 +589,7 @@ class GeneralWindow(QMainWindow):
         self.make_list_of_protocols()
         self.update_the_table()
 
+
     def update_the_table(self):
         """dell all elements of the table and make it again"""
         self.general_table.setRowCount(0)
@@ -607,12 +635,16 @@ class GeneralWindow(QMainWindow):
         """the function makes two lists of files other files and send files"""
         list_of_classes_first = []
         list_of_classes_second = []  # send
+        self._unchecked_files = 0
         for name, path, folder in list_of_file_path:
             new_class = self.make_class_for_a_file(name, path, folder)
             if new_class.status == StatusFile.is_send:
                 list_of_classes_second.append(new_class)
             else:
                 list_of_classes_first.append(new_class)
+                if new_class.status == StatusFile.unchecked:
+                    self._unchecked_files += 1
+
         return list_of_classes_first + list_of_classes_second
 
     def make_class_for_a_file(self, name: str, path: str, folder: str) -> ClassFile:

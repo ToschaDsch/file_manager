@@ -1,28 +1,32 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2025",
-    "project": "P25-060_Finkelmann 1Familienhaus in L\u00f6",
-    "show_static": false,
+    "year": "P-2024",
+    "project": "P24-120_Zwiebelhofer Umb. L\u00f6rrach",
+    "show_static": true,
     "my_projects": {
         "-": {
             "year": null,
-            "status": null
+            "status": "neu"
         },
         "P25-065_Winterhalter-Hauptstr-Elzach": {
             "year": "P-2025",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P24-125_GEWO-Stuckert 2 MFH in Waldkirch": {
             "year": "P-2024",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen": {
             "year": "P-2024",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
             "year": "P-2025",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P24-120_Zwiebelhofer Umb. L\u00f6rrach": {
+            "year": "P-2024",
+            "status": "neue Pl\u00e4ne!"
         }
     }
 }

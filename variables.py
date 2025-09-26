@@ -31,6 +31,7 @@ list_of_aims: list[str] = [by_checking, checked_files_planes, files_to_send]
 text_of_the_excel_file: str = 'Verlauf'
 text_index: str = ' Index '
 name_of_the_useful_cell_in_the_excel_file: str = "Inhalt"
+new_plans = "neue Pläne!"
 
 
 @dataclass
