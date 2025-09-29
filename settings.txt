@@ -2,7 +2,7 @@
     "dir_for_checking": "V:\\",
     "year": "P-2024",
     "project": "P24-120_Zwiebelhofer Umb. L\u00f6rrach",
-    "show_static": true,
+    "show_static": false,
     "my_projects": {
         "-": {
             "year": null,
@@ -10,23 +10,23 @@
         },
         "P25-065_Winterhalter-Hauptstr-Elzach": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P24-125_GEWO-Stuckert 2 MFH in Waldkirch": {
             "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen": {
             "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P24-120_Zwiebelhofer Umb. L\u00f6rrach": {
             "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         }
     }
 }

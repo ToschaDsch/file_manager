@@ -13,13 +13,18 @@ types_of_the_protocol_files = ('.doc', '.docx')
 dir_for_checking: str = 'V:\\'
 name_of_the_folder: str = 'P-20'
 
+# pictures for the buttons
 path_buttons_my_projects_plus: str = './/icos//plus.png'
 path_buttons_my_projects_delete: str = './/icos//trash.png'
+path_buttons_open_the_folder: str = './/icos//open.png'
+
+# types files to check
 incoming_docs: str = 'Eingang Prüfunterlagen'
 checked_files: str = 'geprüfte Unterlagen'
 by_checking: str = '0_Pläne zu prüfen'
 checked_files_planes: str = '1_geprüfte Pläne'
 files_to_send: str = '2_Pläne zu schicken'
+
 file_name_not_to_scan: set[str] = {by_checking, checked_files_planes, files_to_send,
                          'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
 folder_that_i_dont_need: list[str] = ['überholt', 'Überholt', 'überholte Pläne']   #

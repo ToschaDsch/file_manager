@@ -2,7 +2,7 @@ import json
 import os
 
 from PySide6 import QtCore
-from PySide6.QtCore import Qt, QEvent
+from PySide6.QtCore import Qt, QEvent, QFile
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
     QPushButton, QLabel, QCheckBox
@@ -68,7 +68,7 @@ class GeneralWindow(QMainWindow):
         list_of_files = self._list_of_years
         self.make_top_menu(layout=general_layout, list_of_dir=list_of_files)
 
-        # menu up 2 (my projects
+        # menu up 2 (my projects)
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
@@ -363,11 +363,24 @@ class GeneralWindow(QMainWindow):
             index = 0
         self.combobox_dir_project.setCurrentIndex(index)
 
+    def open_the_directory(self):
+        start_the_file(path=self._current_dir_project)
+
     def make_top_menu(self, layout: QVBoxLayout, list_of_dir):
         # make the current directory
         layout_directory = QHBoxLayout()
         layout_directory.addWidget(self.combobox_dir_year)
         layout_directory.addWidget(self.combobox_dir_project)
+
+        #button open the folder
+        button_open = QPushButton()
+        path = variables.path_buttons_open_the_folder
+        h = variables.VariablesForMenus.height_buttons
+        b = VariablesForMenus.width_buttons
+        make_a_buton_with_a_picture(path_for_the_pis=path, h=h, b=b,
+                                    button=button_open,
+                                    function=self.open_the_directory)
+        layout_directory.addWidget(button_open)
         layout.addLayout(layout_directory)
 
         # make it for year
