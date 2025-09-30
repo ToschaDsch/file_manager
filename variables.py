@@ -14,9 +14,10 @@ dir_for_checking: str = 'V:\\'
 name_of_the_folder: str = 'P-20'
 
 # pictures for the buttons
-path_buttons_my_projects_plus: str = './/icos//plus.png'
-path_buttons_my_projects_delete: str = './/icos//trash.png'
-path_buttons_open_the_folder: str = './/icos//open.png'
+path_buttons_my_projects_plus: str = 'pictures//plus.png'
+path_buttons_my_projects_delete: str = 'pictures//trash.png'
+path_buttons_open_the_folder: str = 'pictures//open.png'
+icon: str = './pictures/icon_ferminium.jpg'
 
 # types files to check
 incoming_docs: str = 'Eingang Prüfunterlagen'

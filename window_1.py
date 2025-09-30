@@ -1,7 +1,7 @@
 import json
 import os
 
-from PySide6 import QtCore
+from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QEvent, QFile
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
@@ -20,6 +20,11 @@ from variables import VariablesForMenus
 class GeneralWindow(QMainWindow):
     def __init__(self, show_static: bool = False, *args):
         super(GeneralWindow, self).__init__()
+        pixmap = QtGui.QPixmap(variables.icon)
+        app_icon = QtGui.QIcon(pixmap)
+        self.setWindowIcon(app_icon)
+
+
         self.setWindowTitle(variables.name_of_the_program)
 
         general_layout = QVBoxLayout()
