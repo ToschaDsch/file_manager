@@ -1,7 +1,7 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2024",
-    "project": "P24-120_Zwiebelhofer Umb. L\u00f6rrach",
+    "year": "P-2025",
+    "project": "P25-065_Winterhalter-Hauptstr-Elzach",
     "show_static": false,
     "my_projects": {
         "-": {
@@ -27,6 +27,14 @@
         "P24-120_Zwiebelhofer Umb. L\u00f6rrach": {
             "year": "P-2024",
             "status": null
+        },
+        "P25-057_Kabisch Neub. Gaube Weil": {
+            "year": "P-2025",
+            "status": null
+        },
+        "P25-032_Stuckert MFH Am Elzufer 25b Waldkirch": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
         }
     }
 }

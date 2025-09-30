@@ -455,18 +455,24 @@ class GeneralWindow(QMainWindow):
     def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: dict,
                                  current_project: str) -> None:
         self.combobox_my_projects.clear()
+        model = self.combobox_my_projects.model()
+        i = 0
         for key, value in dict_of_my_projects.items():
             if key == "-":
                 self.combobox_my_projects.addItem(key)
+                i+=1
                 continue
             status = self.check_status_of_the_project(project=key)
             value['status'] = status
             string = key + '    |   ' + status if status else key
             self.combobox_my_projects.addItem(string)
+            if status:
+                model.setData(model.index(i, 0), QColor(*variables.MyColor.unchecked),
+                                  QtCore.Qt.ItemDataRole.BackgroundRole)
+            i+=1
         self.combobox_my_projects.setCurrentText(current_project)
 
     def check_status_of_the_project(self, project: str) -> str|None:
-
         if self.make_the_project_active(project=project):
             return variables.new_plans
         else:
