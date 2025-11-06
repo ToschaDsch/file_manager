@@ -66,7 +66,7 @@ def start_file_is_send(path: str, name: str, subdir: str):
     path = path.replace(variables.incoming_docs, variables.checked_files)
     all_files = get_only_files(path=path)
     for ending in variables.variants_of_the_ending:
-        name_i = name.replace('.pdf', '_' + ending + '.pdf')
+        name_i = name.replace('.pdf', ending + '.pdf')
         if name_i in all_files:
             path += '\\' + name_i
             start_the_file(path=path)
@@ -170,10 +170,14 @@ def get_list_of_send_files(path: str) -> list[str]:
     for file in row_list:
         if file[-4:] == '.pdf':
             file = file[:-4]
-            for n in [7, 6, 4]:
+            k = 0
+            for n in [8, 7, 5]:
                 if file[-n:] in variables.variants_of_the_ending:
-                    list_of_files.append(file[:-(n + 1)])
+                    list_of_files.append(file[:-n])
+                    k += 1
                     break
+            if k == 0:
+                list_of_files.append(file)
     return list_of_files
 
 
@@ -249,6 +253,7 @@ def print_the_information(old_path: str, new_path: str, name: str) -> bool:
     if not os.path.exists(new_path_for_the_folder):
         os.makedirs(new_path_for_the_folder)
     return True
+
 
 
 def move_the_file(old_path: str, new_path: str, name: str) -> None:

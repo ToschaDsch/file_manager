@@ -2,7 +2,7 @@ import json
 import os
 
 from PySide6 import QtCore, QtGui
-from PySide6.QtCore import Qt, QEvent, QFile
+from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
     QPushButton, QLabel, QCheckBox
@@ -23,6 +23,7 @@ class GeneralWindow(QMainWindow):
         pixmap = QtGui.QPixmap(variables.icon)
         app_icon = QtGui.QIcon(pixmap)
         self.setWindowIcon(app_icon)
+
 
 
         self.setWindowTitle(variables.name_of_the_program)

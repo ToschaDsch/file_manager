@@ -30,7 +30,7 @@ file_name_not_to_scan: set[str] = {by_checking, checked_files_planes, files_to_s
                          'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
 folder_that_i_dont_need: list[str] = ['überholt', 'Überholt', 'überholte Pläne']   #
 folder_that_i_dont_need_with_statik: list[str] = ['Statik', 'statik']
-variants_of_the_ending: set[str] = {'PE-PoP', 'PE-PoPG', 'PE-PmP', 'PE-PmPG', 'PE-F', 'PE-U', 'PE-G'}
+variants_of_the_ending: set[str] = {'_PE-PoP', '_PE-PoPG', '_PE-PmP', '_PE-PmPG', '_PE-F', '_PE-U', '_PE-G', ''}
 names_of_protocol: set[str] = {'Prüfbericht_', 'Prüfbericht ', 'Pruefbericht_', 'Pruefbericht ', 'Prüfbericht', 'Pruefbericht'}
 protocol: str = 'Prüfbericht'
 list_of_aims: list[str] = [by_checking, checked_files_planes, files_to_send]
