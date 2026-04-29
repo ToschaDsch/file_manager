@@ -226,8 +226,12 @@ def start_file_by_status(path: str, name: str, protokol_nr: int, folder_to_check
 
 
 def start_the_file(path: str):
-    os.startfile(path)
-
+    try:
+        os.startfile(path)
+    except Exception as err:
+        print('startfile error', path)
+        print(f"Unexpected {err=}, {type(err)=}")
+        raise
 
 def copy_the_file(old_path: str, new_path: str, name: str) -> None:
     print('I copy the file', name)

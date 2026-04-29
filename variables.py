@@ -70,10 +70,10 @@ class VariablesForMenus:
     width_buttons: int = 40
 
 
-@dataclass
+
 class MyColor:
-    unchecked: tuple[int] = (250, 100, 100)
-    by_checking: tuple[int] = (150, 100, 100)
-    checked: tuple[int] = (150, 150, 100)
-    to_send: tuple[int] = (100, 150, 100)
-    is_send: tuple[int] = (100, 100, 150)
+    unchecked: tuple[int, int, int] = (250, 100, 100)
+    by_checking: tuple[int, int, int] = (150, 100, 100)
+    checked: tuple[int, int, int] = (150, 150, 100)
+    to_send: tuple[int, int, int] = (100, 150, 100)
+    is_send: tuple[int, int, int] = (100, 100, 150)

@@ -64,7 +64,7 @@
  [],
  False,
  False,
- 1759239182,
+ 1762441501,
  [('run.exe',
    'C:\\Users\\a.klukin\\PycharmProjects\\file_manager\\.venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],

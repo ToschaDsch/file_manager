@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, QEvent
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QTableWidget, QComboBox, QTableWidgetItem, \
     QPushButton, QLabel, QCheckBox
-
+from sortedcontainers import SortedDict
 import variables
 from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_of_checked_files, \
@@ -23,8 +23,6 @@ class GeneralWindow(QMainWindow):
         pixmap = QtGui.QPixmap(variables.icon)
         app_icon = QtGui.QIcon(pixmap)
         self.setWindowIcon(app_icon)
-
-
 
         self.setWindowTitle(variables.name_of_the_program)
 
@@ -78,8 +76,8 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self._dict_of_my_projects: dict[str, dict[str, str|None]] = {"-":{'year': None,
-                                                                        'status': None}}
+        self._dict_of_my_projects: SortedDict = SortedDict({"-":{'year': None,
+                                                                                        'status': None}})
         self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
 
         self.make_top_menu_2(layout=general_layout,
@@ -410,7 +408,7 @@ class GeneralWindow(QMainWindow):
             self.combobox_dir_project.addItem(str(dir_i))
         self.combobox_dir_project.currentIndexChanged.connect(self.change_index_of_combobox_project)
 
-    def make_top_menu_2(self, layout: QVBoxLayout, dict_of_my_projects: dict):
+    def make_top_menu_2(self, layout: QVBoxLayout, dict_of_my_projects: SortedDict):
         # make the menu for my projects
         layout_my_projects = QHBoxLayout()
         layout_my_projects.addWidget(QLabel(VariablesForMenus.my_projects))
@@ -439,12 +437,13 @@ class GeneralWindow(QMainWindow):
     def change_index_of_combobox_my_projects(self, index: int):
         current_project = list(self._dict_of_my_projects)[index]
         if current_project in ("", '-', None):
-            return None
+            return
         self.make_the_project_active(project=current_project)
-        return None
 
 
     def make_the_project_active(self, project: str) -> int:
+        if project not in self._dict_of_my_projects:
+            return 0
         self._current_year = self._dict_of_my_projects[project]['year']
         self.combobox_dir_year.setCurrentText(self._current_year)
         self.refresh_all()
@@ -458,12 +457,12 @@ class GeneralWindow(QMainWindow):
         self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
                                                     current_project=self._current_project)
 
-    def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: dict,
+    def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: SortedDict,
                                  current_project: str) -> None:
         self.combobox_my_projects.clear()
         model = self.combobox_my_projects.model()
         i = 0
-        for key, value in dict_of_my_projects.items():
+        for key, value in  dict_of_my_projects.items():
             if key == "-":
                 self.combobox_my_projects.addItem(key)
                 i+=1

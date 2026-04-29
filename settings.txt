@@ -1,34 +1,34 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2024",
-    "project": "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen",
-    "show_static": false,
+    "year": "P-2026",
+    "project": "P26-032_ASF Wasserstofferzeugungsanlage FR",
+    "show_static": true,
     "my_projects": {
         "-": {
             "year": null,
             "status": "neu"
         },
-        "P25-065_Winterhalter-Hauptstr-Elzach": {
-            "year": "P-2025",
+        "P17-058_AWO": {
+            "year": "P-2017",
+            "status": null
+        },
+        "P24-059_Luisenbr\u00fccke Baden-Baden": {
+            "year": "P-2024",
             "status": "neue Pl\u00e4ne!"
         },
-        "P24-125_GEWO-Stuckert 2 MFH in Waldkirch": {
+        "P24-100_Kaiser MFH Merzhausen": {
             "year": "P-2024",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen": {
             "year": "P-2024",
-            "status": null
-        },
-        "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
-            "year": "P-2025",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P24-120_Zwiebelhofer Umb. L\u00f6rrach": {
             "year": "P-2024",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
-        "P25-057_Kabisch Neub. Gaube Weil": {
+        "P25-024_Funk Oberkirch Neub. Stadtquartier Untere Linde Oberkirch": {
             "year": "P-2025",
             "status": null
         },
@@ -36,24 +36,52 @@
             "year": "P-2025",
             "status": "neue Pl\u00e4ne!"
         },
-        "P24-100_Kaiser MFH Merzhausen": {
-            "year": "P-2024",
-            "status": null
-        },
-        "P25-024_Funk Oberkirch Neub. Stadtquartier Untere Linde Oberkirch": {
+        "P25-057_Kabisch Neub. Gaube Weil": {
             "year": "P-2025",
             "status": "neue Pl\u00e4ne!"
         },
-        "P25-072_Doganay Erw. Lebensmittelgesch\u00e4ft Weil": {
+        "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-061_Kunzelmann Umb. 1-Familienhaus L\u00d6": {
             "year": "P-2025",
             "status": null
         },
         "P25-064_Rama Anbau Grenzach-Wyhlen": {
             "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-065_Winterhalter-Hauptstr-Elzach": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-088_Walter-Warkotsch Umb. \u00d6konomiegeb. in 1-Familienhaus Rheinfelden": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-113_ATC Schleuderbetonmast Schluchsee": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-118_Verkehrsministerium Salzsilos Albbruck": {
+            "year": "P-2025",
             "status": null
         },
-        "P24-103_Krenzlin Dachgaube Efringen-Kirchen": {
-            "year": "P-2024",
+        "P25-122_Koc Umb. Weil": {
+            "year": "P-2025",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P25-134_Locher Gaube Weil": {
+            "year": "P-2025",
+            "status": null
+        },
+        "P26-030_Kn\u00fcvener Erw. Wohnhaus Rheinfelden": {
+            "year": "P-2026",
+            "status": null
+        },
+        "P26-032_ASF Wasserstofferzeugungsanlage FR": {
+            "year": "P-2026",
             "status": "neue Pl\u00e4ne!"
         }
     }
