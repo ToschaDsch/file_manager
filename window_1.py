@@ -76,8 +76,7 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self._dict_of_my_projects: SortedDict = SortedDict({"-":{'year': None,
-                                                                                        'status': None}})
+        self._dict_of_my_projects: SortedDict = SortedDict({"-":{'year': None, 'status': None}})
         self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
 
         self.make_top_menu_2(layout=general_layout,

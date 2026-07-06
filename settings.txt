@@ -1,28 +1,20 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2026",
-    "project": "P26-032_ASF Wasserstofferzeugungsanlage FR",
-    "show_static": true,
+    "year": "P-2025",
+    "project": "P25-117_FSB Quartier Kleineschholz",
+    "show_static": false,
     "my_projects": {
         "-": {
             "year": null,
             "status": "neu"
         },
-        "P17-058_AWO": {
-            "year": "P-2017",
-            "status": null
-        },
-        "P24-059_Luisenbr\u00fccke Baden-Baden": {
-            "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
-        },
         "P24-100_Kaiser MFH Merzhausen": {
             "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen": {
             "year": "P-2024",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P24-120_Zwiebelhofer Umb. L\u00f6rrach": {
             "year": "P-2024",
@@ -30,19 +22,19 @@
         },
         "P25-024_Funk Oberkirch Neub. Stadtquartier Untere Linde Oberkirch": {
             "year": "P-2025",
-            "status": null
+            "status": "neue Pl\u00e4ne!"
         },
         "P25-032_Stuckert MFH Am Elzufer 25b Waldkirch": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-057_Kabisch Neub. Gaube Weil": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-061_Kunzelmann Umb. 1-Familienhaus L\u00d6": {
             "year": "P-2025",
@@ -50,17 +42,25 @@
         },
         "P25-064_Rama Anbau Grenzach-Wyhlen": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-065_Winterhalter-Hauptstr-Elzach": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-088_Walter-Warkotsch Umb. \u00d6konomiegeb. in 1-Familienhaus Rheinfelden": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
+        },
+        "P25-109_Janzarik Gaube + Balkon FR-Herdern": {
+            "year": "P-2025",
+            "status": null
         },
         "P25-113_ATC Schleuderbetonmast Schluchsee": {
+            "year": "P-2025",
+            "status": null
+        },
+        "P25-117_FSB Quartier Kleineschholz": {
             "year": "P-2025",
             "status": "neue Pl\u00e4ne!"
         },
@@ -70,11 +70,23 @@
         },
         "P25-122_Koc Umb. Weil": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-134_Locher Gaube Weil": {
             "year": "P-2025",
             "status": null
+        },
+        "P26-014_So.Neu 2 MFH mit TG FR": {
+            "year": "P-2026",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P26-015_RPF Br\u00fccke Willst\u00e4tt": {
+            "year": "P-2026",
+            "status": "neue Pl\u00e4ne!"
+        },
+        "P26-029_VILO Umb. Fitnessstudio Schutterwald": {
+            "year": "P-2026",
+            "status": "neue Pl\u00e4ne!"
         },
         "P26-030_Kn\u00fcvener Erw. Wohnhaus Rheinfelden": {
             "year": "P-2026",
@@ -83,6 +95,10 @@
         "P26-032_ASF Wasserstofferzeugungsanlage FR": {
             "year": "P-2026",
             "status": "neue Pl\u00e4ne!"
+        },
+        "P26-045_Steiger Dachgaube L\u00d6": {
+            "year": "P-2026",
+            "status": null
         }
     }
 }
