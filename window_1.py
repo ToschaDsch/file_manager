@@ -1,5 +1,6 @@
 import json
 import os
+from enum import Enum
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QEvent
@@ -13,9 +14,12 @@ from functions_without_general_class import open_the_file, check_the_file, get_d
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
     get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, get_only_files, \
-    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox
+    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox, Settings
 from variables import VariablesForMenus
 
+class ProjectsProperties(Enum):
+    year = "year"
+    status = "status"
 
 class GeneralWindow(QMainWindow):
     def __init__(self, show_static: bool = False, *args):
@@ -76,7 +80,8 @@ class GeneralWindow(QMainWindow):
         self.combobox_my_projects = QComboBox()
         self.button_delete_the_project = QPushButton()
         self.button_add_the_project = QPushButton()
-        self._dict_of_my_projects: SortedDict = SortedDict({"-":{'year': None, 'status': None}})
+        self._dict_of_my_projects: SortedDict = SortedDict({"-":{ProjectsProperties.year.value: None,
+                                                                 ProjectsProperties.status.value: None}})
         self._dict_of_my_projects.update(variables.my_projects) # name, year, status of files
 
         self.make_top_menu_2(layout=general_layout,
@@ -116,11 +121,12 @@ class GeneralWindow(QMainWindow):
     def closeEvent(self, event):
         # save the settings by file close
         path = variables.file_of_settings
-        settings_0 = {'dir_for_checking': variables.dir_for_checking,
-                      'year': variables.current_year,
-                      'project': self._current_project,
-                      'show_static': self._show_static,
-                      'my_projects': self._dict_of_my_projects}
+        settings_0 = {Settings.dir_for_checking.value: variables.dir_for_checking,
+                      Settings.year.value: variables.current_year,
+                      Settings.project.value: self._current_project,
+                      Settings.show_static.value: self._show_static,
+                      Settings.my_projects.value: self._dict_of_my_projects}
+
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -300,8 +306,6 @@ class GeneralWindow(QMainWindow):
         # check - can I move it
         if not self.check_can_i_move_it(status=file.status):
             return None
-        # V:\P-2024\P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen\Eingang Prüfunterlagen\Pläne Haus
-        # 1\P24-117_BEW_H1-BU104_-_BA1_UG_UP20602.pdf if self._number_of_current_protocol
         if int(self._last_two_numbers_of_current_protocol) == 0:
             protocol = ''
         else:
@@ -443,7 +447,7 @@ class GeneralWindow(QMainWindow):
     def make_the_project_active(self, project: str) -> int:
         if project not in self._dict_of_my_projects:
             return 0
-        self._current_year = self._dict_of_my_projects[project]['year']
+        self._current_year = self._dict_of_my_projects[project][ProjectsProperties.year.value]
         self.combobox_dir_year.setCurrentText(self._current_year)
         self.refresh_all()
         self._current_project = project
@@ -451,8 +455,8 @@ class GeneralWindow(QMainWindow):
         return self._unchecked_files
 
     def add_the_project_to_my_project(self):
-        self._dict_of_my_projects[self._current_project] = {'year': self._current_year,
-                                                            'status': None}
+        self._dict_of_my_projects[self._current_project] = {ProjectsProperties.year.value: self._current_year,
+                                                            ProjectsProperties.status.value: None}
         self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
                                                     current_project=self._current_project)
 
@@ -467,7 +471,7 @@ class GeneralWindow(QMainWindow):
                 i+=1
                 continue
             status = self.check_status_of_the_project(project=key)
-            value['status'] = status
+            value[ProjectsProperties.status.value] = status
             string = key + '    |   ' + status if status else key
             self.combobox_my_projects.addItem(string)
             if status:

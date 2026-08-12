@@ -1,6 +1,7 @@
 import io
 import os
 import shutil
+from enum import Enum
 from typing import Any
 import json
 import openpyxl
@@ -10,6 +11,14 @@ from PySide6.QtWidgets import QPushButton, QComboBox
 
 import variables
 from class_file import StatusFile, ClassFile
+
+
+class Settings(Enum):
+    dir_for_checking = 'dir_for_checking'
+    year = 'year'
+    project = 'project'
+    show_static = 'show_static'
+    my_projects = 'my_projects'
 
 def new_list_to_the_combobox(combobox: QComboBox, dict_of_my_projects: dict,
                              current_project: str) -> None:
@@ -459,7 +468,7 @@ def file_excel_open_get_date(file_name: str) -> dict | None:
     return dict_files
 
 
-def read_the_setting_from_the_file(path: str) -> dict[str, Any] | None:
+def read_the_setting_from_the_file(path: str) -> dict[Settings, Any] | None:
     try:
         # Open and read the file
         with open(path, 'r') as file:
@@ -469,11 +478,11 @@ def read_the_setting_from_the_file(path: str) -> dict[str, Any] | None:
             data_dict = json.loads(content)
             print("JSON data successfully parsed as dictionary:")
             print(data_dict)
-            return {'dir_for_checking': data_dict['dir_for_checking'],
-                    'year': data_dict['year'],
-                    'project': data_dict['project'],
-                    'show_static': data_dict['show_static'],
-                    'my_projects': data_dict['my_projects']}
+            return {Settings.dir_for_checking: data_dict[Settings.dir_for_checking.value],
+                    Settings.year: data_dict[Settings.year.value],
+                    Settings.project: data_dict[Settings.project.value],
+                    Settings.show_static: data_dict[Settings.show_static.value],
+                    Settings.my_projects: data_dict[Settings.my_projects.value]}
         except json.JSONDecodeError:
             print("The file content is not valid JSON.")
             return None
@@ -489,10 +498,10 @@ def make_default_settings(path: str) -> dict|None:
     current_year = list_of_years[-1]
     current_list_of_files_for_the_year: list[str] = get_only_folders(path=dir_0 + '\\' + current_year)
     project = current_list_of_files_for_the_year[0]
-    settings_0 = {'dir_for_checking': variables.dir_for_checking,
-                  'year': current_year,
-                  'project': project,
-                  'show_static': False}
+    settings_0 = {Settings.dir_for_checking.value: variables.dir_for_checking,
+                  Settings.year.value: current_year,
+                  Settings.my_projects.value: project,
+                  Settings.show_static.value: False}
     try:
         with open(path, 'w') as file:
             json.dump(settings_0, file, indent=4)

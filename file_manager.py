@@ -7,6 +7,7 @@ import functions_without_general_class
 import variables
 from variables import VariablesForMenus
 from window_1 import GeneralWindow
+from functions_without_general_class import Settings
 
 
 def load_general_menu(show_static: bool = False):
@@ -32,15 +33,15 @@ def get_dict_settings_from_file() -> dict | None:
 
 def set_the_settings() -> bool:
     settings = get_dict_settings_from_file()
-    variables.dir_for_checking = settings['dir_for_checking']
-    variables.current_year = settings['year']
-    variables.current_project = settings['project']
-    show_me_static = settings['show_static']
-    if 'my_projects' in settings:
-        variables.my_projects = settings['my_projects']
+    variables.dir_for_checking = settings[Settings.dir_for_checking]
+    variables.current_year = settings[Settings.year]
+    variables.current_project = settings[Settings.project]
+    show_me_the_static = settings[Settings.show_static]
+    if Settings.my_projects in settings:
+        variables.my_projects = settings[Settings.my_projects]
     else:
         variables.my_projects = dict()
-    return show_me_static
+    return show_me_the_static
 
 if __name__ == "__main__":
     # update settings

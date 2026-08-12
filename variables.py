@@ -24,7 +24,7 @@ incoming_docs: str = 'Eingang Prüfunterlagen'
 checked_files: str = 'geprüfte Unterlagen'
 by_checking: str = '0_Pläne zu prüfen'
 checked_files_planes: str = '1_geprüfte Pläne'
-files_to_send: str = '2_Pläne zu schicken'
+files_to_send: str = 'ELBA-Schritte\\1. geprüft'
 
 file_name_not_to_scan: set[str] = {by_checking, checked_files_planes, files_to_send,
                          'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
