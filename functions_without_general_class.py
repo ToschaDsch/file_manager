@@ -47,9 +47,7 @@ def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
     button.clicked.connect(function)
 
 def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]]:
-    filter_files = {
-        file.stem
-        for file in get_only_files(dir_protocols)
+    filter_files = {file for file in get_only_files(dir_protocols)
         if file.suffix in variables.types_of_the_protocol_files
     }
 
@@ -76,9 +74,10 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
     return not_send_protocols, send_protocols
 
 
-def start_file_is_send(path: Path, name: Path, subdir: Path,
+def start_file_is_send(path: Path, name: str, subdir: Path,
 ) -> None:
     base_dir = path.parent  # remove file name
+    file_path = path/name
 
     if subdir:
         base_dir = base_dir.parent  # remove subdir
@@ -90,7 +89,7 @@ def start_file_is_send(path: Path, name: Path, subdir: Path,
 
     for ending in variables.variants_of_the_ending:
         candidate = checked_dir / (
-            f"{name.stem}{ending}{name.suffix}"
+            f"{file_path.name}{ending}{file_path.suffix}"
         )
 
         if candidate.is_file():
@@ -98,7 +97,7 @@ def start_file_is_send(path: Path, name: Path, subdir: Path,
             return
 
 
-def check_the_file(name: Path, dict_i: dict, folder: Path, status_name: str) -> tuple[str, int] | bool:
+def check_the_file(name: str, dict_i: dict, folder: Path, status_name: str) -> tuple[str, int] | bool:
     for protocol_nr_i, dict_of_files_i in dict_i.items():
         if folder == '':
             if protocol_nr_i == 0:
@@ -119,11 +118,11 @@ def check_the_file(name: Path, dict_i: dict, folder: Path, status_name: str) -> 
 
 
 def get_dict_to_send_files(path: Path, dict_checked_files: dict[str, Path]) -> dict:
-    path2 = variables.files_to_send
+    path2 = Path(variables.files_to_send)
     return get_dict_of(path=path, dict_checked_files=dict_checked_files, path2=path2)
 
 def get_dict_of_checked_files(path: Path, dict_by_checking: dict) -> dict:
-    path2 = variables.checked_files_planes
+    path2 = Path(variables.checked_files_planes)
     return get_dict_of(path=path, dict_checked_files=dict_by_checking, path2=path2)
 
 def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
@@ -140,10 +139,7 @@ def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
     target_path = checked_path / path2
     all_folders = get_only_folders(target_path)
 
-    return get_dict_with_protocol_files(
-        path=target_path,
-        folders=all_folders,
-    )
+    return get_dict_with_protocol_files(path=target_path, folders=all_folders)
 
 
 def get_dict_of_by_checking_files(path: Path) -> dict:
@@ -165,14 +161,13 @@ def get_dict_of_by_checking_files(path: Path) -> dict:
     )
 
 
-def get_dict_with_protocol_files(
-    path: Path,
-    folders: list[Path],
+def get_dict_with_protocol_files(path: Path, folders: list[str],
 ) -> dict:
     dict_protokol_files = {}
 
-    for folder_path in folders:
-        folder_name = folder_path.name
+    for folder_i in folders:
+        folder_path = path / folder_i
+        folder_name = (path/folder_i).name
 
         for protocol_name in variables.names_of_protocol:
             if protocol_name not in folder_name:
@@ -188,13 +183,11 @@ def get_dict_with_protocol_files(
                 return {}
 
             dict_protokol_files[nummer] = {
-                0: get_only_files(folder_path)
+                0: get_only_files(folder_path),
             }
 
             for subfolder in get_only_folders(folder_path):
-                dict_protokol_files[nummer][subfolder.name] = (
-                    get_only_files(subfolder)
-                )
+                dict_protokol_files[nummer][subfolder] = (get_only_files(folder_path/subfolder))
 
             break
 
@@ -235,9 +228,9 @@ def get_list_of_send_files(path: Path) -> list[str]:
     return result
 
 
-def get_only_folders(path: Path) -> list[Path]:
+def get_only_folders(path: Path) -> list[str]:
     try:
-        return [item for item in path.iterdir() if item.is_dir()]
+        return [item.name for item in path.iterdir() if item.is_dir()]
     except Exception as err:
         print("error, by get_the_folders", err)
         return []
@@ -254,7 +247,7 @@ def get_only_files(path: Path) -> list[Path]:
 from pathlib import Path
 
 
-def start_file_by_status(path: Path, name: Path, protokol_nr: int, folder_to_check: Path, subdir: Path,
+def start_file_by_status(path: Path, name: str, protokol_nr: int, folder_to_check: str, subdir: Path,
 ) -> None:
     relative = path.relative_to(variables.incoming_docs)
     path = Path(variables.checked_files) / folder_to_check / relative.parent
@@ -302,8 +295,8 @@ def print_the_information(old_path: Path, new_path: Path, name: Path=None) -> bo
     print("to", new_path)
     print("---->>>>>")
 
-    if not old_path.is_file():
-        print("there is no file", old_path.name)
+    if not old_path.is_file() and not old_path.is_dir():
+        print("there is no file/dir", old_path.name)
         return False
 
     new_path.parent.mkdir(parents=True, exist_ok=True)
@@ -315,10 +308,7 @@ def print_the_information(old_path: Path, new_path: Path, name: Path=None) -> bo
 def move_the_file(old_path: Path, new_path: Path, name: Path=None) -> None:
     print("I move the file", old_path.name)
 
-    if not print_the_information(
-        old_path=old_path,
-        new_path=new_path,
-    ):
+    if not print_the_information(old_path=old_path, new_path=new_path):
         return
 
     try:
@@ -410,7 +400,7 @@ def move_the_file_to_new_protocol_with_status(file: ClassFile, new_protocol: str
                                   status_path=status_path)
 
 
-def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_path: Path, old_protocol: str):
+def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_path: str, old_protocol: str):
     relative_path = file.path.relative_to(
         Path(variables.incoming_docs)
     )
@@ -503,7 +493,7 @@ def get_new_list_of_files_in_the_protocol(dict_files: dict, list_of_files: list[
         for file_name, values in dict_of_names.items():
             index, value = values
 
-            if file.name.name.find(file_name) > 0:
+            if file.name.find(file_name) > 0:
                 file_2 = ClassFile(name=file.name, status=file.status, nr_protokol=file.nr_protokol, subdir=file.subdir,
                                    path=file.path)
                 file_2.name_of_file_in_the_table = file_name
@@ -545,7 +535,7 @@ def file_excel_open_get_date(file_name: str) -> dict | None:
     return dict_files
 
 
-def read_the_setting_from_the_file(path: str) -> dict[Settings, Any] | None:
+def read_the_setting_from_the_file(path: Path) -> dict[Settings, Any] | None:
     try:
         # Open and read the file
         with open(path, 'r') as file:
@@ -575,19 +565,14 @@ def make_default_settings(path: Path) -> dict | None:
 
     dir_0 = Path(variables.dir_for_checking)
 
-    list_of_years = sorted(
-        folder.name
-        for folder in get_only_folders(dir_0)
-        if folder.name.startswith(variables.name_of_the_folder.name)
-    )
+    list_of_years = sorted(folder for folder in get_only_folders(dir_0)
+        if folder.startswith(variables.name_of_the_folder))
 
     current_year = list_of_years[-1]
 
-    current_list_of_files_for_the_year = get_only_folders(
-        dir_0 / current_year
-    )
+    current_list_of_files_for_the_year = get_only_folders(dir_0 / current_year)
 
-    project = current_list_of_files_for_the_year[0].name
+    project = current_list_of_files_for_the_year[0]
 
     settings_0 = {
         Settings.dir_for_checking.value: variables.dir_for_checking,

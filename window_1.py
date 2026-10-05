@@ -34,14 +34,14 @@ class GeneralWindow(QMainWindow):
         general_layout = QVBoxLayout()
 
         # variables
-        dir_0 = variables.dir_for_checking
-        raw_list_of_all_folder = os.listdir(dir_0)
-        self._list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
-        self._current_year: Path = variables.current_year
-        self._current_dir_year: Path = variables.dir_for_checking / variables.current_year
+        dir_0: Path = Path(variables.dir_for_checking)
+        raw_list_of_all_folder: list[Path] = [p for p in dir_0.iterdir() if p.is_dir()]
+        self._list_of_years = list(filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+        self._current_year: Path = Path(variables.current_year)
+        self._current_dir_year: Path = Path(variables.dir_for_checking) / variables.current_year
         self._current_list_of_files_for_the_year = []
-        self._current_project: Path = variables.current_project
-        self._new_global_folder_for_save: Path = variables.new_local_folder
+        self._current_project: Path = Path(variables.current_project)
+        self._new_global_folder_for_save: Path = Path(variables.new_local_folder) / variables.temporary_files
         self._local_current_dir_project: Path = self._new_global_folder_for_save / self._current_project
         self._current_dir_project: Path = Path()
         self._current_list_of_files = []
@@ -65,9 +65,9 @@ class GeneralWindow(QMainWindow):
 
         self._show_static = show_static
         if show_static:
-            self._folder_that_i_dont_need = variables.folder_that_i_dont_need
+            self._folder_that_i_dont_need: list[str] = variables.folder_that_i_dont_need
         else:
-            self._folder_that_i_dont_need = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
+            self._folder_that_i_dont_need: list[str] = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
 
         # menu up
         self.combobox_aim_to_move = QComboBox()
@@ -102,9 +102,9 @@ class GeneralWindow(QMainWindow):
         self.combobox_protocol = QComboBox()
         self.make_menu_bottom(layout=general_layout)
 
-        self.combobox_dir_year.setCurrentText(variables.current_year.name)
+        self.combobox_dir_year.setCurrentText(variables.current_year)
         self.refresh_all()
-        self.combobox_dir_project.setCurrentText(variables.current_project.name)
+        self.combobox_dir_project.setCurrentText(variables.current_project)
         self.combobox_my_projects.setCurrentIndex(0)
 
         widget = QWidget()
@@ -338,7 +338,7 @@ class GeneralWindow(QMainWindow):
         file.nr_protokol = int(self._last_two_numbers_of_current_protocol)
         return None
 
-    def check_can_i_move_it(self, status: StatusFile) -> bool:
+    def check_can_i_move_it(self, status: str) -> bool:
         """the function checks - can you move the file,
         unchecked -> by checking -> checked -> to send -> send
         you can move only in direction ->"""
@@ -596,8 +596,8 @@ class GeneralWindow(QMainWindow):
 
     def change_index_of_combobox_year(self, index: int):
         self._current_year = self._list_of_years[index]
-        self._current_dir_year = variables.dir_for_checking / self._current_year
-        variables.current_year = self._current_year
+        self._current_dir_year = Path(variables.dir_for_checking) / self._current_year
+        variables.current_year = self._current_year.name
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = self._current_list_of_files_for_the_year[0]
         self._current_dir_project = self._current_dir_year / self._current_project
@@ -644,16 +644,18 @@ class GeneralWindow(QMainWindow):
         # files in folders
         for folder_i in list_of_folders:
             dir_i = self._current_dir_incoming_docs / folder_i
-            for file in os.listdir(dir_i):
-                for end_of_the_file  in variables.types_of_the_draw_files:
-                    if file.endswith(end_of_the_file):
-                        self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), folder_i])
+            for file in dir_i.iterdir():
+                if file.is_file():
+                    for extension in variables.types_of_the_draw_files:
+                        if file.suffix == extension:
+                            self._current_list_of_files.append([file.name, file, folder_i])
         # files without folders
         dir_i = self._current_dir_incoming_docs
-        for file in os.listdir(dir_i):
-            for end_of_the_file  in variables.types_of_the_draw_files:
-                if file.endswith(end_of_the_file):
-                    self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
+        for file in dir_i.iterdir():
+            if file.is_file():
+                for extension in variables.types_of_the_draw_files:
+                    if file.suffix == extension:
+                        self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
 
         # move the files to the new space
         self._move_the_files_to_the_new_space()
@@ -670,11 +672,11 @@ class GeneralWindow(QMainWindow):
 
     def _move_the_files_to_the_new_space(self):
         all_folder = get_only_folders(path=self._current_dir_project / variables.checked_files)
-        new_path = self._new_global_folder_for_save / variables.temporary_files / self._current_project
+        new_path = self._new_global_folder_for_save / self._current_project
         for folder_i in (variables.by_checking, variables.checked_files_planes, variables.old_files_to_send):
             if folder_i in all_folder:
-                move_the_file(old_path=self._current_dir_project,
-                              new_path=new_path, name=folder_i)
+                move_the_file(old_path=self._current_dir_project/variables.checked_files/folder_i,
+                              new_path=new_path)
 
 
 
@@ -694,7 +696,7 @@ class GeneralWindow(QMainWindow):
 
         return list_of_classes_first + list_of_classes_second
 
-    def make_class_for_a_file(self, name: Path, path: Path, folder: Path) -> ClassFile:
+    def make_class_for_a_file(self, name: str, path: Path, folder: Path) -> ClassFile:
         status = StatusFile.unchecked
         protocol_nr = 0
         # by checking
@@ -717,7 +719,7 @@ class GeneralWindow(QMainWindow):
             status = result[0]
             protocol_nr = result[1]
         # send file
-        if name.name[:-4] in self._set_send_files:
+        if name[:-4] in self._set_send_files:
             status = StatusFile.is_send
         return ClassFile(name=name, path=path, subdir=folder, status=status, nr_protokol=protocol_nr)
 

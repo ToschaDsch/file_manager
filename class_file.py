@@ -21,11 +21,11 @@ class StatusFile:
 
 
 class ClassFile:
-    def __init__(self, name: Path, path: Path, status: StatusFile = StatusFile.unchecked, nr_protokol: int = 0,
+    def __init__(self, name: str, path: Path, status: str = StatusFile.unchecked, nr_protokol: int = 0,
                  subdir: Path = ''):
-        self.name: Path = name
+        self.name: str = name
         self.path: Path = path
-        self.status: StatusFile = status
+        self.status: str = status
         self.nr_protokol = nr_protokol
         self.subdir: Path = subdir
         self.name_of_file_in_the_table = ''

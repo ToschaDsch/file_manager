@@ -4,15 +4,15 @@ from PySide6.QtWidgets import QMainWindow
 
 name_of_the_program: str = 'file_manager_'
 file_of_settings: str = 'settings.txt'
-current_year: Path = Path('P-2024')
-current_project: Path = Path('P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen')
+current_year: str = 'P-2024'
+current_project: str = 'P24-117_BPD Neub. 4 Wohngeb. BA1 Ehrenkirchen-Kirchhofen'
 my_projects: dict = dict()
 
 types_of_the_draw_files = (".pdf", ".PDF")
 types_of_the_protocol_files = ('.doc', '.docx')
-dir_for_checking: Path = Path('V:\\')
-name_of_the_folder: Path = Path('P-20')
-new_local_folder: Path = Path('C:\\AK\\')
+dir_for_checking: str = 'V:\\'
+name_of_the_folder: str = 'P-20'
+new_local_folder: str = 'C:\\AK\\'
 
 # pictures for the buttons
 path_buttons_my_projects_plus: str = 'pictures//plus.png'
@@ -21,17 +21,17 @@ path_buttons_open_the_folder: str = 'pictures//open.png'
 icon: str = './pictures/icon_ferminium.jpg'
 
 # types files to check
-incoming_docs: Path = Path('Eingang Prüfunterlagen')
-checked_files: Path = Path('geprüfte Unterlagen')
-temporary_files: Path = Path('temporary_files_to_check')
-by_checking: Path = Path('0_Pläne zu prüfen')
-checked_files_planes: Path = Path('1_geprüfte Pläne')
-old_files_to_send: Path = Path('2_Pläne zu schicken')
-files_to_send: Path = Path('ELBA-Schritte') /'\'1. geprüft'
+incoming_docs: str = 'Eingang Prüfunterlagen'
+checked_files: str = 'geprüfte Unterlagen'
+temporary_files: str = 'temporary_files_to_check'
+by_checking: str ='0_Pläne zu prüfen'
+checked_files_planes: str ='1_geprüfte Pläne'
+old_files_to_send: str ='2_Pläne zu schicken'
+files_to_send: str ='ELBA-Schritte\\1. geprüft'
 
 file_name_not_to_scan: set[str] = {by_checking, checked_files_planes, files_to_send,
                          'ELBA-Schritte', 'Pläne neue Indexe','Pläne alte Indexe', 'ELBA-Schritte'}
-folder_that_i_dont_need: list[Path] = [Path('überholt'), Path('Überholt'), Path('überholte Pläne')]   #
+folder_that_i_dont_need: list[str] = ['überholt', 'Überholt', 'überholte Pläne']   #
 folder_that_i_dont_need_with_statik: list[str] = ['Statik', 'statik']
 variants_of_the_ending: set[str] = {'_PE-PoP', '_PE-PoPG', '_PE-PmP', '_PE-PmPG', '_PE-F', '_PE-U', '_PE-G', ''}
 names_of_protocol: set[str] = {'Prufbericht_', 'Prufbericht ',
@@ -39,7 +39,7 @@ names_of_protocol: set[str] = {'Prufbericht_', 'Prufbericht ',
                                'Pruefbericht_', 'Pruefbericht ',
                                'Prüfbericht', 'Pruefbericht'}
 protocol: str = 'Prüfbericht'
-list_of_aims: list[Path] = [by_checking, checked_files_planes, files_to_send]
+list_of_aims: list[str] = [by_checking, checked_files_planes, files_to_send]
 text_of_the_excel_file: str = 'Verlauf'
 text_index: str = ' Index '
 name_of_the_useful_cell_in_the_excel_file: str = "Inhalt"
