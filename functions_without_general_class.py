@@ -25,11 +25,11 @@ class Settings(Enum):
 
 
 def new_list_to_the_combobox(combobox: QComboBox, dict_of_my_projects: dict,
-                             current_project: Path) -> None:
+                             current_project: str) -> None:
     combobox.clear()
     for key, value in dict_of_my_projects.items():
         combobox.addItem(key)
-    combobox.setCurrentText(current_project.name)
+    combobox.setCurrentText(current_project)
 
 def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
                                 button: QPushButton, function):
@@ -47,7 +47,7 @@ def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
     button.clicked.connect(function)
 
 def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]]:
-    filter_files = {file for file in get_only_files(dir_protocols)
+    filter_files = {file.name for file in get_only_files(dir_protocols)
         if file.suffix in variables.types_of_the_protocol_files
     }
 
@@ -74,7 +74,7 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
     return not_send_protocols, send_protocols
 
 
-def start_file_is_send(path: Path, name: str, subdir: Path,
+def start_file_is_send(path: Path, name: str, subdir: str,
 ) -> None:
     base_dir = path.parent  # remove file name
     file_path = path/name
@@ -97,7 +97,7 @@ def start_file_is_send(path: Path, name: str, subdir: Path,
             return
 
 
-def check_the_file(name: str, dict_i: dict, folder: Path, status_name: str) -> tuple[str, int] | bool:
+def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, int] | bool:
     for protocol_nr_i, dict_of_files_i in dict_i.items():
         if folder == '':
             if protocol_nr_i == 0:
@@ -247,7 +247,7 @@ def get_only_files(path: Path) -> list[Path]:
 from pathlib import Path
 
 
-def start_file_by_status(path: Path, name: str, protokol_nr: int, folder_to_check: str, subdir: Path,
+def start_file_by_status(path: Path, name: str, protokol_nr: int, folder_to_check: str, subdir: str,
 ) -> None:
     relative = path.relative_to(variables.incoming_docs)
     path = Path(variables.checked_files) / folder_to_check / relative.parent

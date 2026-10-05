@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 from PySide6 import QtWidgets, QtGui
 
@@ -25,7 +26,7 @@ def load_general_menu(show_static: bool = False):
 
 
 def get_dict_settings_from_file() -> dict | None:
-    path = variables.file_of_settings
+    path = Path(variables.file_of_settings)
     if os.path.exists(path):
         return functions_without_general_class.read_the_setting_from_the_file(path=path)
     else:
@@ -33,6 +34,8 @@ def get_dict_settings_from_file() -> dict | None:
 
 def set_the_settings() -> bool:
     settings = get_dict_settings_from_file()
+    if settings is None:
+        return False
     variables.dir_for_checking = settings[Settings.dir_for_checking]
     variables.current_year = settings[Settings.year]
     variables.current_project = settings[Settings.project]

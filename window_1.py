@@ -1,5 +1,4 @@
 import json
-import os
 from enum import Enum
 from pathlib import Path
 
@@ -36,11 +35,11 @@ class GeneralWindow(QMainWindow):
         # variables
         dir_0: Path = Path(variables.dir_for_checking)
         raw_list_of_all_folder: list[Path] = [p for p in dir_0.iterdir() if p.is_dir()]
-        self._list_of_years = list(filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+        self._list_of_years: list[str] = list(filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))
         self._current_year: Path = Path(variables.current_year)
         self._current_dir_year: Path = Path(variables.dir_for_checking) / variables.current_year
         self._current_list_of_files_for_the_year = []
-        self._current_project: Path = Path(variables.current_project)
+        self._current_project: str = variables.current_project
         self._new_global_folder_for_save: Path = Path(variables.new_local_folder) / variables.temporary_files
         self._local_current_dir_project: Path = self._new_global_folder_for_save / self._current_project
         self._current_dir_project: Path = Path()
@@ -129,7 +128,7 @@ class GeneralWindow(QMainWindow):
                       Settings.project.value: self._current_project,
                       Settings.show_static.value: self._show_static,
                       Settings.my_projects.value: self._dict_of_my_projects,
-                      Settings.dir_for_save.value: self._new_global_folder_for_save, }
+                      Settings.dir_for_save.value: self._new_global_folder_for_save.name, }
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -199,7 +198,7 @@ class GeneralWindow(QMainWindow):
             for variant in variables.names_of_protocol
         ]
 
-        variants.extend(f"{self._current_project.name[:7]} {name}"
+        variants.extend(f"{self._current_project[:7]} {name}"
             for name in variants.copy()
         )
 
@@ -240,7 +239,7 @@ class GeneralWindow(QMainWindow):
         else:
             self._folder_that_i_dont_need = variables.folder_that_i_dont_need + variables.folder_that_i_dont_need_with_statik
         self.refresh_all()
-        current_project = self._current_project
+        current_project: str = self._current_project
         self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
                                                   current_project=self._current_project)
         self.make_the_project_active(project=current_project)
@@ -379,7 +378,7 @@ class GeneralWindow(QMainWindow):
     def open_the_directory(self):
         start_the_file(path=self._current_dir_project)
 
-    def make_top_menu(self, layout: QVBoxLayout, list_of_dir):
+    def make_top_menu(self, layout: QVBoxLayout, list_of_dir: list[str]):
         # make the current directory
         layout_directory = QHBoxLayout()
         layout_directory.addWidget(self.combobox_dir_year)
@@ -450,14 +449,14 @@ class GeneralWindow(QMainWindow):
         self.make_the_project_active(project=current_project)
 
 
-    def make_the_project_active(self, project: Path) -> int:
+    def make_the_project_active(self, project: str) -> int:
         if project not in self._dict_of_my_projects:
             return 0
         self._current_year = self._dict_of_my_projects[project][ProjectsProperties.year.value]
         self.combobox_dir_year.setCurrentText(self._current_year)
         self.refresh_all()
-        self._current_project = project
-        self.combobox_dir_project.setCurrentText(self._current_project.name)
+        self._current_project: str = project
+        self.combobox_dir_project.setCurrentText(self._current_project)
         return self._unchecked_files
 
     def add_the_project_to_my_project(self):
@@ -466,8 +465,7 @@ class GeneralWindow(QMainWindow):
         self.new_list_to_the_combobox_my_projects(dict_of_my_projects=self._dict_of_my_projects,
                                                     current_project=self._current_project)
 
-    def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: SortedDict,
-                                 current_project: Path) -> None:
+    def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: SortedDict, current_project: str) -> None:
         self.combobox_my_projects.clear()
         model = self.combobox_my_projects.model()
         i = 0
@@ -484,9 +482,9 @@ class GeneralWindow(QMainWindow):
                 model.setData(model.index(i, 0), QColor(*variables.MyColor.unchecked),
                                   QtCore.Qt.ItemDataRole.BackgroundRole)
             i+=1
-        self.combobox_my_projects.setCurrentText(current_project.name)
+        self.combobox_my_projects.setCurrentText(current_project)
 
-    def check_status_of_the_project(self, project: Path) -> str|None:
+    def check_status_of_the_project(self, project: str) -> str|None:
         if self.make_the_project_active(project=project):
             return variables.new_plans
         else:
@@ -571,7 +569,7 @@ class GeneralWindow(QMainWindow):
         protocol_widget = QTableWidgetItem(str(new_element.nr_protokol))
         protocol_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         self.general_table.setItem(row_number, 2, protocol_widget)
-        self.general_table.setItem(row_number, 3, QTableWidgetItem(new_element.subdir.name))
+        self.general_table.setItem(row_number, 3, QTableWidgetItem(new_element.subdir))
         VariablesForMenus.table_insert = False
 
     def change_index_of_combobox_aim(self, index: int):
@@ -655,7 +653,7 @@ class GeneralWindow(QMainWindow):
             if file.is_file():
                 for extension in variables.types_of_the_draw_files:
                     if file.suffix == extension:
-                        self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
+                        self._current_list_of_files.append([file.name, file, ''])
 
         # move the files to the new space
         self._move_the_files_to_the_new_space()
@@ -680,7 +678,7 @@ class GeneralWindow(QMainWindow):
 
 
 
-    def make_list_of_class_files(self, list_of_file_path) -> list[ClassFile]:
+    def make_list_of_class_files(self, list_of_file_path: list[str| Path| list[Path]]) -> list[ClassFile]:
         """the function makes two lists of files other files and send files"""
         list_of_classes_first = []
         list_of_classes_second = []  # send
@@ -696,7 +694,7 @@ class GeneralWindow(QMainWindow):
 
         return list_of_classes_first + list_of_classes_second
 
-    def make_class_for_a_file(self, name: str, path: Path, folder: Path) -> ClassFile:
+    def make_class_for_a_file(self, name: str, path: Path, folder: str) -> ClassFile:
         status = StatusFile.unchecked
         protocol_nr = 0
         # by checking
