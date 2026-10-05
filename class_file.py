@@ -1,14 +1,16 @@
 from dataclasses import dataclass
+from pathlib import Path
+
 from variables import MyColor
 
 
 @dataclass
 class StatusFile:
-    unchecked = 'neu'
-    by_checking = 'am Prüfung'
-    checked = 'geprüft'
-    to_send = 'zu schicken'
-    is_send = 'verschickt'
+    unchecked: str = 'neu'
+    by_checking: str = 'am Prüfung'
+    checked: str = 'geprüft'
+    to_send: str = 'zu schicken'
+    is_send: str = 'verschickt'
     dict_of_status = {unchecked: 0, by_checking: 1, checked: 2, to_send: 3, is_send: 4}
     list_of_status = [unchecked, by_checking, checked, to_send, is_send]
     dict_of_palette_colors = {unchecked: 'rgb' + str(MyColor.unchecked),
@@ -19,13 +21,13 @@ class StatusFile:
 
 
 class ClassFile:
-    def __init__(self, name: str, path: str, status: str = StatusFile.unchecked, nr_protokol: int = 0,
-                 subdir: str = ''):
-        self.name = name
-        self.path = path
-        self.status = status
+    def __init__(self, name: Path, path: Path, status: StatusFile = StatusFile.unchecked, nr_protokol: int = 0,
+                 subdir: Path = ''):
+        self.name: Path = name
+        self.path: Path = path
+        self.status: StatusFile = status
         self.nr_protokol = nr_protokol
-        self.subdir = subdir
+        self.subdir: Path = subdir
         self.name_of_file_in_the_table = ''
         self.name_of_the_plan = ''
         self.index = ''

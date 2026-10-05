@@ -2,6 +2,7 @@ import io
 import os
 import shutil
 from enum import Enum
+from pathlib import Path
 from typing import Any
 import json
 import openpyxl
@@ -15,17 +16,20 @@ from class_file import StatusFile, ClassFile
 
 class Settings(Enum):
     dir_for_checking = 'dir_for_checking'
+    dir_for_save = 'dir_for_save'
+    name_of_the_folder = 'name_of_the_folder'
     year = 'year'
     project = 'project'
     show_static = 'show_static'
     my_projects = 'my_projects'
 
+
 def new_list_to_the_combobox(combobox: QComboBox, dict_of_my_projects: dict,
-                             current_project: str) -> None:
+                             current_project: Path) -> None:
     combobox.clear()
     for key, value in dict_of_my_projects.items():
         combobox.addItem(key)
-    combobox.setCurrentText(current_project)
+    combobox.setCurrentText(current_project.name)
 
 def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
                                 button: QPushButton, function):
@@ -42,46 +46,59 @@ def make_a_buton_with_a_picture(path_for_the_pis: str, h: int, b: int,
     button.setFixedWidth(b)
     button.clicked.connect(function)
 
-def get_list_of_all_protocols(dir_protocols: str) -> tuple[list[Any] | list[str], list[Any]]:
-    all_files = get_only_files(path=dir_protocols)
-    doc = variables.types_of_the_protocol_files[0]
-    docx = variables.types_of_the_protocol_files[1]
-    doc_files = {x[:-len(doc)] for x in all_files if x[-len(doc):] == doc}
-    docx_files = {x[:-len(docx)] for x in all_files if x[-len(docx):] == docx}
-    filter_files = doc_files | docx_files
-    filter_files_2 = set()
-    for variant_of_protocol in variables.names_of_protocol:
-        for file_name_i in filter_files:
-            if variant_of_protocol in file_name_i:
-                n = file_name_i.index(variant_of_protocol)
-                file_filter_name = file_name_i[n + len(variant_of_protocol):]
-                filter_files_2.add(file_filter_name)
-    send_protocols = []
-    not_send_protocols = []
-    for protocol_i in filter_files_2:
-        if protocol_i.isnumeric():
-            send_protocols.append(variables.protocol + '_' + protocol_i)
+def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]]:
+    filter_files = {
+        file.stem
+        for file in get_only_files(dir_protocols)
+        if file.suffix in variables.types_of_the_protocol_files
+    }
+
+    filter_files_2: set[str] = set()
+
+    for variant in variables.names_of_protocol:
+        for file_name in filter_files:
+            if variant in file_name:
+                n = file_name.index(variant)
+                filter_files_2.add(file_name[n + len(variant):])
+
+    send_protocols: list[str] = []
+    not_send_protocols: list[str] = []
+
+    for protocol in filter_files_2:
+        if protocol.isnumeric():
+            send_protocols.append(f"{variables.protocol}_{protocol}")
         else:
-            not_send_protocols.append(variables.protocol + protocol_i)
-    if len(not_send_protocols) == 0:
-        not_send_protocols = [variables.protocol + '_' + '00']
+            not_send_protocols.append(f"{variables.protocol}{protocol}")
+
+    if not not_send_protocols:
+        not_send_protocols = [f"{variables.protocol}_00"]
+
     return not_send_protocols, send_protocols
 
 
-def start_file_is_send(path: str, name: str, subdir: str):
-    path = path.replace('\\' + name, '')
-    if subdir != '':
-        path = path.replace('\\' + subdir, '')
-    path = path.replace(variables.incoming_docs, variables.checked_files)
-    all_files = get_only_files(path=path)
+def start_file_is_send(path: Path, name: Path, subdir: Path,
+) -> None:
+    base_dir = path.parent  # remove file name
+
+    if subdir:
+        base_dir = base_dir.parent  # remove subdir
+
+    checked_dir = (
+        Path(variables.checked_files)
+        / base_dir.relative_to(variables.incoming_docs)
+    )
+
     for ending in variables.variants_of_the_ending:
-        name_i = name.replace('.pdf', ending + '.pdf')
-        if name_i in all_files:
-            path += '\\' + name_i
-            start_the_file(path=path)
+        candidate = checked_dir / (
+            f"{name.stem}{ending}{name.suffix}"
+        )
+
+        if candidate.is_file():
+            start_the_file(candidate)
+            return
 
 
-def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, int] | bool:
+def check_the_file(name: Path, dict_i: dict, folder: Path, status_name: str) -> tuple[str, int] | bool:
     for protocol_nr_i, dict_of_files_i in dict_i.items():
         if folder == '':
             if protocol_nr_i == 0:
@@ -101,226 +118,267 @@ def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tu
     return False
 
 
-def get_dict_to_send_files(path: str, dict_checked_files: dict) -> dict:
+def get_dict_to_send_files(path: Path, dict_checked_files: dict[str, Path]) -> dict:
     path2 = variables.files_to_send
     return get_dict_of(path=path, dict_checked_files=dict_checked_files, path2=path2)
 
-def get_dict_of_checked_files(path: str, dict_by_checking: dict) -> dict:
+def get_dict_of_checked_files(path: Path, dict_by_checking: dict) -> dict:
     path2 = variables.checked_files_planes
     return get_dict_of(path=path, dict_checked_files=dict_by_checking, path2=path2)
 
-def get_dict_of(path: str, dict_checked_files: dict, path2: str) -> dict:
-    path = path + '\\' + variables.checked_files
-    if len(dict_checked_files) == 0:
-        return dict()
-    all_folder = get_only_folders(path=path)
-    if variables.files_to_send not in set(all_folder):
-        print('no subdir', variables.files_to_send)
-        return dict()
-    path = path + '\\' + path2
-    all_folder = get_only_folders(path=path)
-    return get_dict_with_protocol_files(path=path, folders=all_folder)
+def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
+) -> dict:
+    checked_path = path / variables.checked_files
+
+    if not dict_checked_files:
+        return {}
+
+    if not (checked_path / variables.files_to_send).is_dir():
+        print("no subdir", variables.files_to_send)
+        return {}
+
+    target_path = checked_path / path2
+    all_folders = get_only_folders(target_path)
+
+    return get_dict_with_protocol_files(
+        path=target_path,
+        folders=all_folders,
+    )
 
 
-def get_dict_of_by_checking_files(path: str) -> dict:
-    all_folder = get_only_folders(path=path)
-    if variables.checked_files not in set(all_folder):
-        print('no subdir !!', variables.checked_files)
-        return dict()
-    path = path + '\\' + variables.checked_files
-    all_folder = get_only_folders(path=path)
-    if variables.by_checking not in set(all_folder):
-        print('no subdir', variables.by_checking)
-        return dict()
-    path = path + '\\' + variables.by_checking
-    all_folder = get_only_folders(path=path)
-    return get_dict_with_protocol_files(path=path, folders=all_folder)
+def get_dict_of_by_checking_files(path: Path) -> dict:
+    checked_path = path / variables.checked_files
+
+    if not checked_path.is_dir():
+        print("no subdir !!", variables.checked_files)
+        return {}
+
+    checking_path = checked_path / variables.by_checking
+
+    if not checking_path.is_dir():
+        print("no subdir", variables.by_checking)
+        return {}
+
+    return get_dict_with_protocol_files(
+        path=checking_path,
+        folders=get_only_folders(checking_path),
+    )
 
 
-def get_dict_with_protocol_files(path: str, folders: list[str]) -> dict:
-    # all files in folders
-    dict_protokol_files = dict()
+def get_dict_with_protocol_files(
+    path: Path,
+    folders: list[Path],
+) -> dict:
+    dict_protokol_files = {}
 
-    for folder_i in folders:
-        for name_i in variables.names_of_protocol:
-            if folder_i.find(name_i) != -1:
-                nummer_i = folder_i.replace(name_i, '')
-                try:
-                    nummer_i = int(nummer_i)
-                except Exception as err:
-                    print('there is no number', folder_i)
-                    print(f"Unexpected {err=}, {type(err)=}")
-                    return dict()
-                path_i = path + '\\' + folder_i
-                dict_protokol_files[nummer_i] = {0:get_only_files(path=path_i)}
-                folders_ii = get_only_folders(path=path_i)
-                for folder_j in folders_ii:
-                    path_j = path_i + '\\' + folder_j
-                    dict_protokol_files[nummer_i][folder_j] = get_only_files(path=path_j)
+    for folder_path in folders:
+        folder_name = folder_path.name
+
+        for protocol_name in variables.names_of_protocol:
+            if protocol_name not in folder_name:
                 continue
+
+            nummer_str = folder_name.replace(protocol_name, "")
+
+            try:
+                nummer = int(nummer_str)
+            except Exception as err:
+                print("there is no number", folder_name)
+                print(f"Unexpected {err=}, {type(err)=}")
+                return {}
+
+            dict_protokol_files[nummer] = {
+                0: get_only_files(folder_path)
+            }
+
+            for subfolder in get_only_folders(folder_path):
+                dict_protokol_files[nummer][subfolder.name] = (
+                    get_only_files(subfolder)
+                )
+
+            break
+
     return dict_protokol_files
 
+def get_list_of_send_files(path: Path) -> list[str]:
+    checked_path = path / variables.checked_files
 
-def get_list_of_send_files(path: str) -> list[str]:
-    all_folder = get_only_folders(path=path)
-    if variables.checked_files not in set(all_folder):
-        print('no subdir', variables.checked_files)
+    if not checked_path.is_dir():
+        print("no subdir", variables.checked_files)
         return []
-    path = path + '\\' + variables.checked_files
-    row_list = set(get_only_files(path=path))
-    list_of_folders = set(get_only_folders(path=path))
 
-    list_of_folders = list_of_folders.difference(variables.file_name_not_to_scan)
-    for folder in list_of_folders:
-        path_i = path + '\\' + folder
-        files_in_the_folder = set(get_only_files(path=path_i))
-        row_list = row_list.union(files_in_the_folder)
-    list_of_files = []
-    for file in row_list:
-        if file[-4:] == '.pdf':
-            file = file[:-4]
-            k = 0
-            for n in [8, 7, 5]:
-                if file[-n:] in variables.variants_of_the_ending:
-                    list_of_files.append(file[:-n])
-                    k += 1
-                    break
-            if k == 0:
-                list_of_files.append(file)
-    return list_of_files
+    pdf_names: set[str] = {p.name for p in checked_path.iterdir() if p.is_file()}
+
+    ignored = set(variables.file_name_not_to_scan)
+
+    for folder in checked_path.iterdir():
+        if not folder.is_dir() or folder.name in ignored:
+            continue
+
+        pdf_names |= {p.name for p in folder.iterdir() if p.is_file()}
+
+    result: list[str] = []
+
+    for filename in pdf_names:
+        if not filename.endswith(".pdf"):
+            continue
+
+        stem = Path(filename).stem
+
+        for n in (8, 7, 5):
+            if stem[-n:] in variables.variants_of_the_ending:
+                result.append(stem[:-n])
+                break
+        else:
+            result.append(stem)
+
+    return result
 
 
-def get_only_folders(path: str) -> list[str]:
-    """print("Only directories:")
-    print([name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))])
-    print("\nOnly files:")
-    print([name for name in os.listdir(path) if not os.path.isdir(os.path.join(path, name))])
-    print("\nAll directories and files :")
-    print([name for name in os.listdir(path)])"""
-    res = []
+def get_only_folders(path: Path) -> list[Path]:
     try:
-        res = [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
+        return [item for item in path.iterdir() if item.is_dir()]
     except Exception as err:
         print("error, by get_the_folders", err)
-    return res
+        return []
 
 
-def get_only_files(path: str) -> list[str]:
-    res = []
+def get_only_files(path: Path) -> list[Path]:
     try:
-        res = [name for name in os.listdir(path) if not os.path.isdir(os.path.join(path, name))]
+        return [item for item in path.iterdir() if item.is_file()]
     except Exception as err:
         print("error, by get_only_files", err)
-    return res
+        return []
 
 
-def start_file_by_status(path: str, name: str, protokol_nr: int, folder_to_check: str, subdir: str):
-    path = path.replace(variables.incoming_docs, variables.checked_files + '\\' + folder_to_check)
-    path = path.replace(name, '')
-    if subdir != '':
-        path = path.replace('\\' + subdir, '')
-    all_folder = get_only_folders(path=path)
-    for name_i in variables.names_of_protocol:
-        name_of_the_protocol = name_i + str(protokol_nr)
-        if name_of_the_protocol in all_folder:
-            if path[-1:] == "\\":
-                path = path[:-1]
-            path += '\\' + name_of_the_protocol
-            if subdir != '':
-                path += '\\' + subdir
-            all_files = get_only_files(path=path)
-            if name in all_files:
-                path += '\\' + name
-                start_the_file(path=path)
+from pathlib import Path
 
 
-def start_the_file(path: str):
+def start_file_by_status(path: Path, name: Path, protokol_nr: int, folder_to_check: Path, subdir: Path,
+) -> None:
+    relative = path.relative_to(variables.incoming_docs)
+    path = Path(variables.checked_files) / folder_to_check / relative.parent
+
+    if subdir:
+        path = path.parent
+
+    for protocol_prefix in variables.names_of_protocol:
+        protocol_name = f"{protocol_prefix}{protokol_nr}"
+        file_path = path / protocol_name
+
+        if subdir:
+            file_path /= subdir
+
+        file_path /= name
+
+        if file_path.is_file():
+            start_the_file(file_path)
+            return
+
+
+def start_the_file(path: Path) -> None:
     try:
-        os.startfile(path)
+        os.startfile(path)  # or os.startfile(str(path))
     except Exception as err:
-        print('startfile error', path)
+        print("startfile error", path)
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
-def copy_the_file(old_path: str, new_path: str, name: str) -> None:
-    print('I copy the file', name)
-    if not print_the_information(old_path=old_path, new_path=new_path, name=name):
-        return None
+def copy_the_file(old_path: Path, new_path: Path) -> None:
+    print("I copy the file", old_path.name)
+
+    if not print_the_information(old_path, new_path):
+        return
+
     try:
         shutil.copyfile(old_path, new_path)
-        return None
     except Exception as err:
-        print('copy error', name)
+        print("copy error", old_path.name)
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
-def print_the_information(old_path: str, new_path: str, name: str) -> bool:
-    print('from', old_path)
-    print('to', new_path)
-    print('---->>>>>')
+def print_the_information(old_path: Path, new_path: Path, name: Path=None) -> bool:
+    print("from", old_path)
+    print("to", new_path)
+    print("---->>>>>")
 
-    if not os.path.isfile(old_path):
-        print('there is no file', name)
+    if not old_path.is_file():
+        print("there is no file", old_path.name)
         return False
-    new_path_for_the_folder = new_path.replace(name, '')
-    if not os.path.exists(new_path_for_the_folder):
-        os.makedirs(new_path_for_the_folder)
+
+    new_path.parent.mkdir(parents=True, exist_ok=True)
+
     return True
 
 
 
-def move_the_file(old_path: str, new_path: str, name: str) -> None:
-    print('I move the file', name)
-    if not print_the_information(old_path=old_path, new_path=new_path, name=name):
-        return None
+def move_the_file(old_path: Path, new_path: Path, name: Path=None) -> None:
+    print("I move the file", old_path.name)
+
+    if not print_the_information(
+        old_path=old_path,
+        new_path=new_path,
+    ):
+        return
+
     try:
         shutil.move(old_path, new_path)
-        return None
     except Exception as err:
-        print('move error', name)
+        print("move error", old_path.name)
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
-
 def move_from_unchecked_to_by_checking(file: ClassFile, protocol: str = ''):
-    old_path = file.path
-    if protocol == '':
-        new_part = variables.checked_files + '\\' + variables.by_checking
-    else:
-        new_part = variables.checked_files + '\\' + variables.by_checking + '\\' + protocol
-    new_path = file.path.replace(variables.incoming_docs, new_part)
+    relative_path = file.path.relative_to(Path(variables.incoming_docs))
+
+    new_path = (Path(variables.checked_files)/ variables.by_checking/ protocol/ relative_path)
+
     file.status = StatusFile.by_checking
-    copy_the_file(old_path=old_path, new_path=new_path, name=file.name)
+
+    copy_the_file(old_path=file.path,new_path=new_path)
 
 
 def move_from_by_checking_to_checked(file: ClassFile, protocol: str = ''):
-    if protocol == '':
-        new_part = variables.checked_files + '\\' + variables.by_checking
-    else:
-        new_part = variables.checked_files + '\\' + variables.by_checking + '\\' + protocol
-    old_path = file.path.replace(variables.incoming_docs, new_part)
+    relative_path = file.path.relative_to(Path(variables.incoming_docs))
 
-    if protocol == '':
-        new_part = variables.checked_files + '\\' + variables.checked_files_planes
-    else:
-        new_part = variables.checked_files + '\\' + variables.checked_files_planes + '\\' + protocol
-    new_path = file.path.replace(variables.incoming_docs, new_part)
-    copy_the_file(old_path=old_path, new_path=new_path, name=file.name)
+    source_root = (Path(variables.checked_files)/ variables.by_checking)
+
+    target_root = (Path(variables.checked_files)/ variables.checked_files_planes)
+
+    if protocol:
+        source_root /= protocol
+        target_root /= protocol
+
+    old_path = source_root / relative_path
+    new_path = target_root / relative_path
+
+    copy_the_file(
+        old_path=old_path,
+        new_path=new_path,
+    )
+
     file.status = StatusFile.checked
 
 
-def move_from_checked_to_to_send(file: ClassFile, protocol: str = ''):
-    if protocol == '':
-        new_part = variables.checked_files + '\\' + variables.checked_files_planes
-    else:
-        new_part = variables.checked_files + '\\' + variables.checked_files_planes + '\\' + protocol
-    old_path = file.path.replace(variables.incoming_docs, new_part)
-    if protocol == '':
-        new_part = variables.checked_files + '\\' + variables.files_to_send
-    else:
-        new_part = variables.checked_files + '\\' + variables.files_to_send + '\\' + protocol
-    new_path = file.path.replace(variables.incoming_docs, new_part)
-    copy_the_file(old_path=old_path, new_path=new_path, name=file.name)
+def move_from_checked_to_to_send(
+    file: ClassFile,
+    protocol: str = "",
+) -> None:
+    relative_path = file.path.relative_to(variables.incoming_docs)
+
+    checked_root = (Path(variables.checked_files)/ variables.checked_files_planes)
+
+    send_root = (Path(variables.checked_files)/ variables.files_to_send)
+
+    if protocol:
+        checked_root /= protocol
+        send_root /= protocol
+
+    old_path = checked_root / relative_path
+    new_path = send_root / relative_path
+
+    copy_the_file(old_path=old_path, new_path=new_path)
+
     file.status = StatusFile.to_send
 
 
@@ -352,12 +410,17 @@ def move_the_file_to_new_protocol_with_status(file: ClassFile, new_protocol: str
                                   status_path=status_path)
 
 
-def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_path: str, old_protocol: str):
-    new_part = variables.checked_files + '\\' + status_path + '\\' + old_protocol
-    old_path = file.path.replace(variables.incoming_docs, new_part)
-    new_part = variables.checked_files + '\\' + status_path + '\\' + str(new_protocol)
-    new_path = file.path.replace(variables.incoming_docs, new_part)
-    move_the_file(old_path=old_path, new_path=new_path, name=file.name)
+def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_path: Path, old_protocol: str):
+    relative_path = file.path.relative_to(
+        Path(variables.incoming_docs)
+    )
+
+    base_path = Path(variables.checked_files) / status_path
+
+    old_path = base_path / old_protocol / relative_path
+    new_path = base_path / new_protocol / relative_path
+
+    move_the_file(old_path=old_path,new_path=new_path)
 
 
 def open_the_file(file: ClassFile):
@@ -378,25 +441,39 @@ def open_the_file(file: ClassFile):
 
 
 def get_list_of_file_in_the_protocol(list_of_all_files: list[ClassFile], number_of_current_protocol: int,
-                                     current_dir_incoming_docs: str) ->  list[ClassFile]|None:
-    list_of_file_in_protocol = []
-    for file in list_of_all_files:
-        if file.nr_protokol == number_of_current_protocol:
-            list_of_file_in_protocol.append(file)
-    all_files = get_only_files(path=current_dir_incoming_docs)
-    all_excel_files = [name for name in all_files if name[-5:] == '.xlsx']
-    file_name = ''
+                                     current_dir_incoming_docs: Path) -> list[ClassFile] | None:
+
+    list_of_file_in_protocol = [
+        file
+        for file in list_of_all_files
+        if file.nr_protokol == number_of_current_protocol
+    ]
+
+    all_excel_files = [
+        file
+        for file in get_only_files(current_dir_incoming_docs)
+        if file.suffix == ".xlsx"
+    ]
+
+    excel_file: Path | None = None
+
     for file in all_excel_files:
-        if file.find(variables.text_of_the_excel_file):
-            file_name = file
+        if variables.text_of_the_excel_file in file.name:
+            excel_file = file
             break
-    if file_name == '':
+
+    if excel_file is None:
         return None
-    dir_for_excel_file = current_dir_incoming_docs + '\\' + file_name
-    dict_files = file_excel_open_get_date(file_name=dir_for_excel_file)
+
+    dict_files = file_excel_open_get_date(file_name=excel_file)
+
     if dict_files is None:
         return None
-    return get_new_list_of_files_in_the_protocol(dict_files=dict_files, list_of_files=list_of_file_in_protocol)
+
+    return get_new_list_of_files_in_the_protocol(
+        dict_files=dict_files,
+        list_of_files=list_of_file_in_protocol,
+    )
 
 
 def get_new_list_of_files_in_the_protocol(dict_files: dict, list_of_files: list[ClassFile]) -> list[ClassFile]:
@@ -426,7 +503,7 @@ def get_new_list_of_files_in_the_protocol(dict_files: dict, list_of_files: list[
         for file_name, values in dict_of_names.items():
             index, value = values
 
-            if file.name.find(file_name) > 0:
+            if file.name.name.find(file_name) > 0:
                 file_2 = ClassFile(name=file.name, status=file.status, nr_protokol=file.nr_protokol, subdir=file.subdir,
                                    path=file.path)
                 file_2.name_of_file_in_the_table = file_name
@@ -478,11 +555,14 @@ def read_the_setting_from_the_file(path: str) -> dict[Settings, Any] | None:
             data_dict = json.loads(content)
             print("JSON data successfully parsed as dictionary:")
             print(data_dict)
+            if Settings.dir_for_save.value not in data_dict:
+                data_dict[Settings.dir_for_save.value] = variables.new_local_folder
             return {Settings.dir_for_checking: data_dict[Settings.dir_for_checking.value],
                     Settings.year: data_dict[Settings.year.value],
                     Settings.project: data_dict[Settings.project.value],
                     Settings.show_static: data_dict[Settings.show_static.value],
-                    Settings.my_projects: data_dict[Settings.my_projects.value]}
+                    Settings.my_projects: data_dict[Settings.my_projects.value],
+                    Settings.dir_for_save: data_dict[Settings.dir_for_save.value]}
         except json.JSONDecodeError:
             print("The file content is not valid JSON.")
             return None
@@ -490,22 +570,40 @@ def read_the_setting_from_the_file(path: str) -> dict[Settings, Any] | None:
         print(f"Error reading the file: {e}")
         return None
 
-def make_default_settings(path: str) -> dict|None:
+def make_default_settings(path: Path) -> dict | None:
     print(f"The file does not exist at: {path}")
-    dir_0 = variables.dir_for_checking
-    raw_list_of_all_folder = os.listdir(dir_0)
-    list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+
+    dir_0 = Path(variables.dir_for_checking)
+
+    list_of_years = sorted(
+        folder.name
+        for folder in get_only_folders(dir_0)
+        if folder.name.startswith(variables.name_of_the_folder.name)
+    )
+
     current_year = list_of_years[-1]
-    current_list_of_files_for_the_year: list[str] = get_only_folders(path=dir_0 + '\\' + current_year)
-    project = current_list_of_files_for_the_year[0]
-    settings_0 = {Settings.dir_for_checking.value: variables.dir_for_checking,
-                  Settings.year.value: current_year,
-                  Settings.my_projects.value: project,
-                  Settings.show_static.value: False}
+
+    current_list_of_files_for_the_year = get_only_folders(
+        dir_0 / current_year
+    )
+
+    project = current_list_of_files_for_the_year[0].name
+
+    settings_0 = {
+        Settings.dir_for_checking.value: variables.dir_for_checking,
+        Settings.year.value: current_year,
+        Settings.my_projects.value: project,
+        Settings.show_static.value: False,
+        Settings.dir_for_save.value: variables.new_local_folder,
+    }
+
     try:
-        with open(path, 'w') as file:
-            json.dump(settings_0, file, indent=4)
+        path.write_text(
+            json.dumps(settings_0, indent=4),
+            encoding="utf-8",
+        )
         print(f"Dictionary saved as JSON to '{path}'.")
     except Exception as e:
         print(f"Failed to save JSON: {e}")
+
     return settings_0

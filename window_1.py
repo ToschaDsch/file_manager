@@ -1,6 +1,7 @@
 import json
 import os
 from enum import Enum
+from pathlib import Path
 
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import Qt, QEvent
@@ -13,8 +14,8 @@ from class_file import StatusFile, ClassFile
 from functions_without_general_class import open_the_file, check_the_file, get_dict_of_checked_files, \
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
-    get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, get_only_files, \
-    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox, Settings
+    get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, \
+    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox, Settings, move_the_file
 from variables import VariablesForMenus
 
 class ProjectsProperties(Enum):
@@ -36,13 +37,15 @@ class GeneralWindow(QMainWindow):
         dir_0 = variables.dir_for_checking
         raw_list_of_all_folder = os.listdir(dir_0)
         self._list_of_years = list(filter(lambda x: (x[:4] == variables.name_of_the_folder), raw_list_of_all_folder))
-        self._current_year: str = variables.current_year
-        self._current_dir_year = variables.dir_for_checking + '\\' + variables.current_year
+        self._current_year: Path = variables.current_year
+        self._current_dir_year: Path = variables.dir_for_checking / variables.current_year
         self._current_list_of_files_for_the_year = []
-        self._current_project = variables.current_project
-        self._current_dir_project = ''
+        self._current_project: Path = variables.current_project
+        self._new_global_folder_for_save: Path = variables.new_local_folder
+        self._local_current_dir_project: Path = self._new_global_folder_for_save / self._current_project
+        self._current_dir_project: Path = Path()
         self._current_list_of_files = []
-        self._current_dir_incoming_docs = ''
+        self._current_dir_incoming_docs: Path = Path()
         self._list_of_all_files_of_the_project = []
         self._list_class_files = []
         self._dict_by_checking_files = dict()
@@ -99,9 +102,9 @@ class GeneralWindow(QMainWindow):
         self.combobox_protocol = QComboBox()
         self.make_menu_bottom(layout=general_layout)
 
-        self.combobox_dir_year.setCurrentText(variables.current_year)
+        self.combobox_dir_year.setCurrentText(variables.current_year.name)
         self.refresh_all()
-        self.combobox_dir_project.setCurrentText(variables.current_project)
+        self.combobox_dir_project.setCurrentText(variables.current_project.name)
         self.combobox_my_projects.setCurrentIndex(0)
 
         widget = QWidget()
@@ -125,8 +128,8 @@ class GeneralWindow(QMainWindow):
                       Settings.year.value: variables.current_year,
                       Settings.project.value: self._current_project,
                       Settings.show_static.value: self._show_static,
-                      Settings.my_projects.value: self._dict_of_my_projects}
-
+                      Settings.my_projects.value: self._dict_of_my_projects,
+                      Settings.dir_for_save.value: self._new_global_folder_for_save, }
         try:
             with open(path, 'w') as file:
                 json.dump(settings_0, file, indent=4)
@@ -188,23 +191,26 @@ class GeneralWindow(QMainWindow):
 
         layout.addLayout(layout_bottom)
 
-    def open_the_protokol(self):
-        """the function opens the current protocol"""
-        all_files = get_only_files(path=self._current_dir_project)
-        variants_of_the_name: list[str] = []
-        for variant in variables.names_of_protocol:
-            variants_of_the_name.append(self._current_protocol.replace(variables.protocol, variant))
-        for name in variants_of_the_name.copy():
-            variants_of_the_name.append(self._current_project[:7] + " " + name)
-        for name_i in variants_of_the_name:
-            for type_of_the_file in variables.types_of_the_protocol_files:
-                name_of_the_file = name_i + type_of_the_file
-                if name_of_the_file in all_files:
-                    file_path = self._current_dir_project + "\\" + name_of_the_file
+    def open_the_protokol(self) -> None:
+        """Open the current protocol."""
+
+        variants = [
+            self._current_protocol.replace(variables.protocol, variant)
+            for variant in variables.names_of_protocol
+        ]
+
+        variants.extend(f"{self._current_project.name[:7]} {name}"
+            for name in variants.copy()
+        )
+
+        for name in variants:
+            for extension in variables.types_of_the_protocol_files:
+                file_path = self._current_dir_project / f"{name}{extension}"
+
+                if file_path.is_file():
                     print(file_path)
-                    start_the_file(path=file_path)
-                    return None
-        return None
+                    start_the_file(file_path)
+                    return
 
     def move_the_file_to_the_protocol(self):
         current_protocol = int(self._last_two_numbers_of_current_protocol)
@@ -332,7 +338,7 @@ class GeneralWindow(QMainWindow):
         file.nr_protokol = int(self._last_two_numbers_of_current_protocol)
         return None
 
-    def check_can_i_move_it(self, status: str) -> bool:
+    def check_can_i_move_it(self, status: StatusFile) -> bool:
         """the function checks - can you move the file,
         unchecked -> by checking -> checked -> to send -> send
         you can move only in direction ->"""
@@ -402,9 +408,9 @@ class GeneralWindow(QMainWindow):
 
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = variables.current_project
-        self._current_dir_project = self._current_dir_year + '\\' + self._current_project
+        self._current_dir_project = self._current_dir_year / self._current_project
         self._list_of_all_files_of_the_project = get_only_folders(path=self._current_dir_project)
-        self._current_dir_incoming_docs = self._current_dir_project + '\\' + variables.incoming_docs
+        self._current_dir_incoming_docs = self._current_dir_project / variables.incoming_docs
 
         # make it for the project
         for dir_i in self._current_list_of_files_for_the_year:
@@ -444,14 +450,14 @@ class GeneralWindow(QMainWindow):
         self.make_the_project_active(project=current_project)
 
 
-    def make_the_project_active(self, project: str) -> int:
+    def make_the_project_active(self, project: Path) -> int:
         if project not in self._dict_of_my_projects:
             return 0
         self._current_year = self._dict_of_my_projects[project][ProjectsProperties.year.value]
         self.combobox_dir_year.setCurrentText(self._current_year)
         self.refresh_all()
         self._current_project = project
-        self.combobox_dir_project.setCurrentText(self._current_project)
+        self.combobox_dir_project.setCurrentText(self._current_project.name)
         return self._unchecked_files
 
     def add_the_project_to_my_project(self):
@@ -461,7 +467,7 @@ class GeneralWindow(QMainWindow):
                                                     current_project=self._current_project)
 
     def new_list_to_the_combobox_my_projects(self, dict_of_my_projects: SortedDict,
-                                 current_project: str) -> None:
+                                 current_project: Path) -> None:
         self.combobox_my_projects.clear()
         model = self.combobox_my_projects.model()
         i = 0
@@ -478,9 +484,9 @@ class GeneralWindow(QMainWindow):
                 model.setData(model.index(i, 0), QColor(*variables.MyColor.unchecked),
                                   QtCore.Qt.ItemDataRole.BackgroundRole)
             i+=1
-        self.combobox_my_projects.setCurrentText(current_project)
+        self.combobox_my_projects.setCurrentText(current_project.name)
 
-    def check_status_of_the_project(self, project: str) -> str|None:
+    def check_status_of_the_project(self, project: Path) -> str|None:
         if self.make_the_project_active(project=project):
             return variables.new_plans
         else:
@@ -555,7 +561,7 @@ class GeneralWindow(QMainWindow):
         self.general_table.insertRow(row_number)
         VariablesForMenus.table_insert = True
         # b0
-        self.general_table.setItem(row_number, 0, QTableWidgetItem(str(new_element.name[:-4])))
+        self.general_table.setItem(row_number, 0, QTableWidgetItem(str(new_element.name.name[:-4])))
         item_status = QLabel(new_element.status)
         item_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         color = StatusFile.dict_of_palette_colors[new_element.status]
@@ -565,7 +571,7 @@ class GeneralWindow(QMainWindow):
         protocol_widget = QTableWidgetItem(str(new_element.nr_protokol))
         protocol_widget.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
         self.general_table.setItem(row_number, 2, protocol_widget)
-        self.general_table.setItem(row_number, 3, QTableWidgetItem(new_element.subdir))
+        self.general_table.setItem(row_number, 3, QTableWidgetItem(new_element.subdir.name))
         VariablesForMenus.table_insert = False
 
     def change_index_of_combobox_aim(self, index: int):
@@ -590,11 +596,11 @@ class GeneralWindow(QMainWindow):
 
     def change_index_of_combobox_year(self, index: int):
         self._current_year = self._list_of_years[index]
-        self._current_dir_year = variables.dir_for_checking + '\\' + self._current_year
+        self._current_dir_year = variables.dir_for_checking / self._current_year
         variables.current_year = self._current_year
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = self._current_list_of_files_for_the_year[0]
-        self._current_dir_project = self._current_dir_year + '\\' + self._current_project
+        self._current_dir_project = self._current_dir_year / self._current_project
         self.combobox_dir_project.clear()
         for dir_i in self._current_list_of_files_for_the_year:
             self.combobox_dir_project.addItem(str(dir_i))
@@ -609,7 +615,7 @@ class GeneralWindow(QMainWindow):
         self.refresh_all()
 
     def refresh_all(self):
-        self._current_dir_project = self._current_dir_year + '\\' + self._current_project
+        self._current_dir_project = self._current_dir_year / self._current_project
         self._list_of_all_files_of_the_project = get_only_folders(path=self._current_dir_project)
 
         self.make_list_for_all_files()
@@ -630,14 +636,14 @@ class GeneralWindow(QMainWindow):
         if variables.incoming_docs not in self._list_of_all_files_of_the_project:
             print('there is no', variables.incoming_docs)
             return None
-        self._current_dir_incoming_docs = self._current_dir_project + '\\' + variables.incoming_docs
+        self._current_dir_incoming_docs = self._current_dir_project / variables.incoming_docs
         list_of_folders = get_only_folders(path=self._current_dir_incoming_docs)
         set_of_folders = set(list_of_folders) - set(self._folder_that_i_dont_need)
         list_of_folders = list(set_of_folders)
         self._current_list_of_files = []
         # files in folders
         for folder_i in list_of_folders:
-            dir_i = self._current_dir_incoming_docs + '\\' + folder_i
+            dir_i = self._current_dir_incoming_docs / folder_i
             for file in os.listdir(dir_i):
                 for end_of_the_file  in variables.types_of_the_draw_files:
                     if file.endswith(end_of_the_file):
@@ -648,15 +654,29 @@ class GeneralWindow(QMainWindow):
             for end_of_the_file  in variables.types_of_the_draw_files:
                 if file.endswith(end_of_the_file):
                     self._current_list_of_files.append([os.path.join(file), os.path.join(dir_i, file), ''])
+
+        # move the files to the new space
+        self._move_the_files_to_the_new_space()
+        self._local_current_dir_project = self._new_global_folder_for_save / self._current_project
         # list of all send files
-        self._dict_by_checking_files = get_dict_of_by_checking_files(path=self._current_dir_project)
-        self._dict_checked_files = get_dict_of_checked_files(path=self._current_dir_project,
+        self._dict_by_checking_files = get_dict_of_by_checking_files(path=self._local_current_dir_project)
+        self._dict_checked_files = get_dict_of_checked_files(path=self._local_current_dir_project,
                                                              dict_by_checking=self._dict_by_checking_files)
-        self._dict_to_send_files = get_dict_to_send_files(path=self._current_dir_project,
+        self._dict_to_send_files = get_dict_to_send_files(path=self._local_current_dir_project,
                                                           dict_checked_files=self._dict_checked_files)
         self._set_send_files = set(get_list_of_send_files(path=self._current_dir_project))
         self._list_class_files = self.make_list_of_class_files(self._current_list_of_files)
         return None
+
+    def _move_the_files_to_the_new_space(self):
+        all_folder = get_only_folders(path=self._current_dir_project / variables.checked_files)
+        new_path = self._new_global_folder_for_save / variables.temporary_files / self._current_project
+        for folder_i in (variables.by_checking, variables.checked_files_planes, variables.old_files_to_send):
+            if folder_i in all_folder:
+                move_the_file(old_path=self._current_dir_project,
+                              new_path=new_path, name=folder_i)
+
+
 
     def make_list_of_class_files(self, list_of_file_path) -> list[ClassFile]:
         """the function makes two lists of files other files and send files"""
@@ -674,7 +694,7 @@ class GeneralWindow(QMainWindow):
 
         return list_of_classes_first + list_of_classes_second
 
-    def make_class_for_a_file(self, name: str, path: str, folder: str) -> ClassFile:
+    def make_class_for_a_file(self, name: Path, path: Path, folder: Path) -> ClassFile:
         status = StatusFile.unchecked
         protocol_nr = 0
         # by checking
@@ -697,7 +717,7 @@ class GeneralWindow(QMainWindow):
             status = result[0]
             protocol_nr = result[1]
         # send file
-        if name[:-4] in self._set_send_files:
+        if name.name[:-4] in self._set_send_files:
             status = StatusFile.is_send
         return ClassFile(name=name, path=path, subdir=folder, status=status, nr_protokol=protocol_nr)
 
