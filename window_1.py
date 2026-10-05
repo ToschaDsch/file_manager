@@ -561,7 +561,7 @@ class GeneralWindow(QMainWindow):
         self.general_table.insertRow(row_number)
         VariablesForMenus.table_insert = True
         # b0
-        self.general_table.setItem(row_number, 0, QTableWidgetItem(str(new_element.name.name[:-4])))
+        self.general_table.setItem(row_number, 0, QTableWidgetItem(str(new_element.name[:-4])))
         item_status = QLabel(new_element.status)
         item_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
         color = StatusFile.dict_of_palette_colors[new_element.status]
