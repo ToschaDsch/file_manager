@@ -1,7 +1,7 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2024",
-    "project": "P24-007_Fiedler Umb. Scheune + Neub. 3 Ferienwohnung Kenzingen",
+    "year": "P-2026",
+    "project": "P26-003_Stuckert MFH FR Freytagstra\u00dfe",
     "show_static": false,
     "my_projects": {
         "-": {

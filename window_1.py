@@ -35,7 +35,8 @@ class GeneralWindow(QMainWindow):
         # variables
         dir_0: Path = Path(variables.dir_for_checking)
         raw_list_of_all_folder: list[Path] = [p for p in dir_0.iterdir() if p.is_dir()]
-        self._list_of_years: list[str] = list(filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))
+        self._list_of_years: list[str] = [y.stem for y in
+                                          (filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))]
         self._current_year: Path = Path(variables.current_year)
         self._current_dir_year: Path = Path(variables.dir_for_checking) / variables.current_year
         self._current_list_of_files_for_the_year = []
@@ -595,7 +596,7 @@ class GeneralWindow(QMainWindow):
     def change_index_of_combobox_year(self, index: int):
         self._current_year = self._list_of_years[index]
         self._current_dir_year = Path(variables.dir_for_checking) / self._current_year
-        variables.current_year = self._current_year.name
+        variables.current_year = self._current_year
         self._current_list_of_files_for_the_year = get_only_folders(path=self._current_dir_year)
         self._current_project = self._current_list_of_files_for_the_year[0]
         self._current_dir_project = self._current_dir_year / self._current_project
