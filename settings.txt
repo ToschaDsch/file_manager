@@ -1,7 +1,7 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2026",
-    "project": "P26-001_B\u00fcy\u00fckculha-Schmidt Neub. MFH Gengenbach",
+    "year": "P-2025",
+    "project": "P25-061_Kunzelmann Umb. 1-Familienhaus L\u00d6",
     "show_static": false,
     "my_projects": {
         "-": {
@@ -46,7 +46,7 @@
         },
         "P25-109_Janzarik Gaube + Balkon FR-Herdern": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-113_ATC Schleuderbetonmast Schluchsee": {
             "year": "P-2025",

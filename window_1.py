@@ -319,22 +319,28 @@ class GeneralWindow(QMainWindow):
         # copy the file to the aim
         match self._current_aim_to_move:
             case StatusFile.by_checking:
-                move_from_unchecked_to_by_checking(file=file, protocol=protocol)
+                move_from_unchecked_to_by_checking(file=file, protocol=protocol,
+                                                   current_project=self._current_project)
             case StatusFile.checked:
                 if file.status == StatusFile.unchecked:
-                    move_from_unchecked_to_by_checking(file=file, protocol=protocol)
+                    move_from_unchecked_to_by_checking(file=file, protocol=protocol,
+                                                       current_project=self._current_project)
                     self.move_the_file(file=file)
                 else:
-                    move_from_by_checking_to_checked(file=file, protocol=protocol)
+                    move_from_by_checking_to_checked(file=file, protocol=protocol,
+                                                       current_project=self._current_project)
             case _:
                 if file.status == StatusFile.unchecked:
-                    move_from_unchecked_to_by_checking(file=file, protocol=protocol)
+                    move_from_unchecked_to_by_checking(file=file, protocol=protocol,
+                                                       current_project=self._current_project)
                     self.move_the_file(file=file)
                 elif file.status == StatusFile.by_checking:
-                    move_from_by_checking_to_checked(file=file, protocol=protocol)
+                    move_from_by_checking_to_checked(file=file, protocol=protocol,
+                                                       current_project=self._current_project)
                     self.move_the_file(file=file)
                 else:
-                    move_from_checked_to_to_send(file=file, protocol=protocol)
+                    move_from_checked_to_to_send(file=file, protocol=protocol,
+                                                       current_project=self._current_project)
         file.nr_protokol = int(self._last_two_numbers_of_current_protocol)
         return None
 
@@ -663,7 +669,7 @@ class GeneralWindow(QMainWindow):
         self._dict_by_checking_files = get_dict_of_by_checking_files(path=self._local_current_dir_project)
         self._dict_checked_files = get_dict_of_checked_files(path=self._local_current_dir_project,
                                                              dict_by_checking=self._dict_by_checking_files)
-        self._dict_to_send_files = get_dict_to_send_files(path=self._local_current_dir_project,
+        self._dict_to_send_files = get_dict_to_send_files(path=self._current_dir_project,
                                                           dict_checked_files=self._dict_checked_files)
         self._set_send_files = set(get_list_of_send_files(path=self._current_dir_project))
         self._list_class_files = self.make_list_of_class_files(self._current_list_of_files)

@@ -100,13 +100,14 @@ def start_file_is_send(path: Path, name: str, subdir: str,
 
 
 def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, int] | bool:
+
     for protocol_nr_i, dict_of_files_i in dict_i.items():
         if folder == '':
             if protocol_nr_i == 0:
                 if name in dict_i[protocol_nr_i]:
                     return status_name, protocol_nr_i
             else:
-                if name in dict_i[protocol_nr_i][0]:
+                if name in [x.name for x in dict_i[protocol_nr_i][0]]:
                     return status_name, protocol_nr_i
             continue
         else:
@@ -114,14 +115,25 @@ def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tu
                 continue
             for folder_j, list_of_files_j in dict_of_files_i.items():
                 if folder_j == folder:
-                    if name in list_of_files_j:
+                    if name in [x.name for x in list_of_files_j]:
                         return status_name, protocol_nr_i
     return False
 
 
 def get_dict_to_send_files(path: Path, dict_checked_files: dict[str, Path]) -> dict:
     path2 = Path(variables.files_to_send)
-    return get_dict_of(path=path, dict_checked_files=dict_checked_files, path2=path2)
+    checked_path = path  # / variables.checked_files
+
+    if not dict_checked_files:
+        return {}
+    target_path = checked_path / variables.checked_files / path2
+    all_folders = get_only_folders(target_path)
+
+    if not target_path.is_dir():
+        print("no subdir", target_path)
+        return {}
+
+    return get_dict_with_protocol_files(path=target_path, folders=all_folders)
 
 def get_dict_of_checked_files(path: Path, dict_by_checking: dict) -> dict:
     path2 = Path(variables.checked_files_planes)
@@ -134,8 +146,8 @@ def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
     if not dict_checked_files:
         return {}
 
-    if not (checked_path / variables.files_to_send).is_dir():
-        print("no subdir", variables.files_to_send)
+    if not (checked_path / path2).is_dir():
+        print("no subdir", checked_path / path2)
         return {}
 
     target_path = checked_path / path2
@@ -286,6 +298,11 @@ def copy_the_file(old_path: Path, new_path: Path) -> None:
         return
 
     try:
+        new_path = new_path/old_path.name
+        # Create missing directories
+        new_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Copy the file
         shutil.copyfile(old_path, new_path)
     except Exception as err:
         print("copy error", old_path.name)
@@ -318,49 +335,37 @@ def move_the_file(old_path: Path, new_path: Path, name: Path=None) -> None:
         print(f"Unexpected {err=}, {type(err)=}")
         raise
 
-def move_from_unchecked_to_by_checking(file: ClassFile, protocol: str = ''):
-    relative_path = file.path.relative_to(Path(variables.incoming_docs))
-    source_root = (Path(variables.checked_files) / variables.by_checking)
-    target_root = (Path(variables.checked_files) / variables.checked_files_planes)
+def move_from_unchecked_to_by_checking(file: ClassFile, current_project: str, protocol: str = ''):
+    source_root = file.path
+    target_root = (Path(variables.new_local_folder)/ variables.temporary_files/ current_project/variables.by_checking)
+
+    if protocol:
+        target_root /= protocol
+
+    copy_the_file(old_path=source_root, new_path=target_root)
+    file.status = StatusFile.by_checking
+
+    file.status = StatusFile.by_checking
+
+
+def move_from_by_checking_to_checked(file: ClassFile, current_project: str, protocol: str = ''):
+
+    source_root = (Path(variables.new_local_folder)/ variables.temporary_files/ current_project/variables.by_checking)
+    target_root = (Path(variables.new_local_folder)/ variables.temporary_files/current_project/variables.checked_files_planes)
 
     if protocol:
         source_root /= protocol
         target_root /= protocol
+    source_root /= file.name
 
-    old_path = source_root / relative_path
-    new_path = target_root / relative_path
-
-    copy_the_file(old_path=old_path, new_path=new_path)
-    file.status = StatusFile.by_checking
-
-    #new_path = (Path(variables.new_local_folder)/ variables.temporary_files/ file.path /variables.by_checking/ protocol)
-    file.status = StatusFile.by_checking
-    #copy_the_file(old_path=file.path,new_path=new_path)
-
-
-def move_from_by_checking_to_checked(file: ClassFile, protocol: str = ''):
-    relative_path = file.path.relative_to(Path(variables.incoming_docs))
-    source_root = (Path(variables.checked_files)/ variables.by_checking)
-    target_root = (Path(variables.checked_files)/ variables.checked_files_planes)
-
-    if protocol:
-        source_root /= protocol
-        target_root /= protocol
-
-    old_path = source_root / relative_path
-    new_path = target_root / relative_path
-
-    copy_the_file(old_path=old_path, new_path=new_path)
+    copy_the_file(old_path=source_root, new_path=target_root)
     file.status = StatusFile.checked
 
 
-def move_from_checked_to_to_send(
-    file: ClassFile,
-    protocol: str = "",
+def move_from_checked_to_to_send(file: ClassFile, current_project: str, protocol: str = "",
 ) -> None:
-    relative_path = file.path.relative_to(variables.incoming_docs)
 
-    checked_root = (Path(variables.checked_files)/ variables.checked_files_planes)
+    checked_root = (Path(variables.new_local_folder)/ variables.temporary_files/current_project/variables.checked_files_planes)
 
     send_root = (Path(variables.checked_files)/ variables.files_to_send)
 
@@ -368,10 +373,9 @@ def move_from_checked_to_to_send(
         checked_root /= protocol
         send_root /= protocol
 
-    old_path = checked_root / relative_path
-    new_path = send_root / relative_path
+    checked_root /= file.name
 
-    copy_the_file(old_path=old_path, new_path=new_path)
+    copy_the_file(old_path=checked_root, new_path=send_root)
 
     file.status = StatusFile.to_send
 
