@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pathlib import Path
 from PySide6.QtWidgets import QMainWindow
 
 name_of_the_program: str = 'file_manager_'

@@ -77,7 +77,9 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
 def start_file_is_send(path: Path, name: str, subdir: str,
 ) -> None:
     base_dir = path.parent  # remove file name
-    file_path = path/name
+    file_path = path
+    start_the_file(path)
+    return
 
     if subdir:
         base_dir = base_dir.parent  # remove subdir
@@ -93,7 +95,7 @@ def start_file_is_send(path: Path, name: str, subdir: str,
         )
 
         if candidate.is_file():
-            start_the_file(candidate)
+            start_the_file(path)
             return
 
 
@@ -127,7 +129,7 @@ def get_dict_of_checked_files(path: Path, dict_by_checking: dict) -> dict:
 
 def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
 ) -> dict:
-    checked_path = path / variables.checked_files
+    checked_path = path #/ variables.checked_files
 
     if not dict_checked_files:
         return {}
@@ -143,7 +145,7 @@ def get_dict_of(path: Path, dict_checked_files: dict, path2: Path,
 
 
 def get_dict_of_by_checking_files(path: Path) -> dict:
-    checked_path = path / variables.checked_files
+    checked_path = path #/ variables.checked_files
 
     if not checked_path.is_dir():
         print("no subdir !!", variables.checked_files)
@@ -303,8 +305,6 @@ def print_the_information(old_path: Path, new_path: Path, name: Path=None) -> bo
 
     return True
 
-
-
 def move_the_file(old_path: Path, new_path: Path, name: Path=None) -> None:
     print("I move the file", old_path.name)
 
@@ -320,19 +320,27 @@ def move_the_file(old_path: Path, new_path: Path, name: Path=None) -> None:
 
 def move_from_unchecked_to_by_checking(file: ClassFile, protocol: str = ''):
     relative_path = file.path.relative_to(Path(variables.incoming_docs))
+    source_root = (Path(variables.checked_files) / variables.by_checking)
+    target_root = (Path(variables.checked_files) / variables.checked_files_planes)
 
-    new_path = (Path(variables.checked_files)/ variables.by_checking/ protocol/ relative_path)
+    if protocol:
+        source_root /= protocol
+        target_root /= protocol
 
+    old_path = source_root / relative_path
+    new_path = target_root / relative_path
+
+    copy_the_file(old_path=old_path, new_path=new_path)
     file.status = StatusFile.by_checking
 
-    copy_the_file(old_path=file.path,new_path=new_path)
+    #new_path = (Path(variables.new_local_folder)/ variables.temporary_files/ file.path /variables.by_checking/ protocol)
+    file.status = StatusFile.by_checking
+    #copy_the_file(old_path=file.path,new_path=new_path)
 
 
 def move_from_by_checking_to_checked(file: ClassFile, protocol: str = ''):
     relative_path = file.path.relative_to(Path(variables.incoming_docs))
-
     source_root = (Path(variables.checked_files)/ variables.by_checking)
-
     target_root = (Path(variables.checked_files)/ variables.checked_files_planes)
 
     if protocol:
@@ -342,11 +350,7 @@ def move_from_by_checking_to_checked(file: ClassFile, protocol: str = ''):
     old_path = source_root / relative_path
     new_path = target_root / relative_path
 
-    copy_the_file(
-        old_path=old_path,
-        new_path=new_path,
-    )
-
+    copy_the_file(old_path=old_path, new_path=new_path)
     file.status = StatusFile.checked
 
 
