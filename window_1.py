@@ -264,7 +264,7 @@ class GeneralWindow(QMainWindow):
 
     def open_the_picked_files(self):
         for file in self._picked_files:
-            open_the_file(file=file)
+            open_the_file(file=file, project_name=self._current_project)
         self.select_rows(row_indices=self._selected_rows)
 
     def make_list_of_file_in_the_protocol(self):
@@ -730,4 +730,4 @@ class GeneralWindow(QMainWindow):
 
     def double_click_the_table_item(self, item: QTableWidgetItem):
         file: ClassFile = self._list_class_files[item.row()]
-        open_the_file(file=file)
+        open_the_file(file=file, project_name=self._current_project)

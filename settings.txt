@@ -1,7 +1,7 @@
 {
     "dir_for_checking": "V:\\",
-    "year": "P-2025",
-    "project": "P25-061_Kunzelmann Umb. 1-Familienhaus L\u00d6",
+    "year": "P-2026",
+    "project": "P26-078_Maier San. Wohnhaus Stechertweg FR",
     "show_static": false,
     "my_projects": {
         "-": {
@@ -18,15 +18,15 @@
         },
         "P25-024_Funk Oberkirch Neub. Stadtquartier Untere Linde Oberkirch": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-057_Kabisch Neub. Gaube Weil": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-060_Finkelmann 1Familienhaus in L\u00f6": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-061_Kunzelmann Umb. 1-Familienhaus L\u00d6": {
             "year": "P-2025",
@@ -42,7 +42,7 @@
         },
         "P25-088_Walter-Warkotsch Umb. \u00d6konomiegeb. in 1-Familienhaus Rheinfelden": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-109_Janzarik Gaube + Balkon FR-Herdern": {
             "year": "P-2025",
@@ -62,15 +62,15 @@
         },
         "P25-122_Koc Umb. Weil": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P25-134_Locher Gaube Weil": {
             "year": "P-2025",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P26-003_Stuckert MFH FR Freytagstra\u00dfe": {
             "year": "P-2026",
-            "status": "neue Pl\u00e4ne!"
+            "status": null
         },
         "P26-014_So.Neu 2 MFH mit TG FR": {
             "year": "P-2026",
@@ -100,7 +100,15 @@
             "year": "P-2026",
             "status": "neue Pl\u00e4ne!"
         },
+        "P26-078_Maier San. Wohnhaus Stechertweg FR": {
+            "year": "P-2026",
+            "status": "neue Pl\u00e4ne!"
+        },
         "P26-081_Vanacore + Piluso Um- und Anb. an Wohnhaus Weil": {
+            "year": "P-2026",
+            "status": null
+        },
+        "P26-082_Unm\u00fcssig HDI-Geb\u00e4ude Schreiberstr. FR": {
             "year": "P-2026",
             "status": "neue Pl\u00e4ne!"
         }

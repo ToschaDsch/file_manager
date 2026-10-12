@@ -5,6 +5,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 import json
+from unittest import case
+
 import openpyxl
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QPixmap, Qt
@@ -261,10 +263,13 @@ def get_only_files(path: Path) -> list[Path]:
 from pathlib import Path
 
 
-def start_file_by_status(path: Path, name: str, protokol_nr: int, folder_to_check: str, subdir: str,
+def start_file_by_status(project_name: str, name: str, protokol_nr: int, folder_to_check: str, subdir: str,
 ) -> None:
-    relative = path.relative_to(variables.incoming_docs)
-    path = Path(variables.checked_files) / folder_to_check / relative.parent
+    match folder_to_check:
+        case variables.by_checking | variables.checked_files_planes:
+            path = Path(variables.new_local_folder) / variables.temporary_files / project_name / folder_to_check
+        case variables.files_to_send:
+            path = Path(variables.dir_for_checking) / project_name / variables.files_to_send
 
     if subdir:
         path = path.parent
@@ -421,18 +426,18 @@ def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_pat
     move_the_file(old_path=old_path,new_path=new_path)
 
 
-def open_the_file(file: ClassFile):
+def open_the_file(file: ClassFile, project_name: str):
     match file.status:
         case StatusFile.unchecked:
             start_the_file(path=file.path)
         case StatusFile.by_checking:
-            start_file_by_status(path=file.path, name=file.name, protokol_nr=file.nr_protokol,
+            start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
                                  folder_to_check=variables.by_checking, subdir=file.subdir)
         case StatusFile.checked:
-            start_file_by_status(path=file.path, name=file.name, protokol_nr=file.nr_protokol,
+            start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
                                  folder_to_check=variables.checked_files_planes, subdir=file.subdir)
         case StatusFile.to_send:
-            start_file_by_status(path=file.path, name=file.name, protokol_nr=file.nr_protokol,
+            start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
                                  folder_to_check=variables.files_to_send, subdir=file.subdir)
         case StatusFile.is_send:
             start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
