@@ -442,6 +442,17 @@ def open_the_file(file: ClassFile, project_name: str):
         case StatusFile.is_send:
             start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
 
+def delete_the_local_folder_with_project(project_name: str) -> bool:
+    path = Path(variables.new_local_folder)/variables.temporary_files/project_name
+    print("i delete the folder", path)
+    try:
+        #shutil.rmtree(path)
+        return True
+    except Exception as err:
+        print("delete error", path)
+        print(f"Unexpected {err=}, {type(err)=}")
+        return False
+
 
 def get_list_of_file_in_the_protocol(list_of_all_files: list[ClassFile], number_of_current_protocol: int,
                                      current_dir_incoming_docs: Path) -> list[ClassFile] | None:

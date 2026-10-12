@@ -14,7 +14,8 @@ from functions_without_general_class import open_the_file, check_the_file, get_d
     get_dict_of_by_checking_files, get_dict_to_send_files, get_list_of_send_files, get_only_folders, \
     move_from_by_checking_to_checked, move_from_checked_to_to_send, move_from_unchecked_to_by_checking, \
     get_list_of_all_protocols, get_list_of_file_in_the_protocol, move_the_file_to_new_protocol, \
-    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox, Settings, move_the_file
+    start_the_file, make_a_buton_with_a_picture, new_list_to_the_combobox, Settings, move_the_file, \
+    delete_the_local_folder_with_project
 from variables import VariablesForMenus
 
 class ProjectsProperties(Enum):
@@ -500,6 +501,9 @@ class GeneralWindow(QMainWindow):
     def delete_the_project_from_my_project(self):
         current_project = self.combobox_my_projects.currentText()
         if current_project == "-":
+            return None
+        is_the_folder_deleted = delete_the_local_folder_with_project(project_name=self._current_project)
+        if not is_the_folder_deleted:
             return None
         if current_project in self._dict_of_my_projects:
             del self._dict_of_my_projects[current_project]
