@@ -5,7 +5,6 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 import json
-from unittest import case
 
 import openpyxl
 from PySide6.QtCore import QSize
@@ -76,29 +75,10 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
     return not_send_protocols, send_protocols
 
 
-def start_file_is_send(path: Path, name: str, subdir: str,
-) -> None:
-    base_dir = path.parent  # remove file name
-    file_path = path
+def start_file_is_send(path: Path, name: str, subdir: str) -> None:
     start_the_file(path)
     return
 
-    if subdir:
-        base_dir = base_dir.parent  # remove subdir
-
-    checked_dir = (
-        Path(variables.checked_files)
-        / base_dir.relative_to(variables.incoming_docs)
-    )
-
-    for ending in variables.variants_of_the_ending:
-        candidate = checked_dir / (
-            f"{file_path.name}{ending}{file_path.suffix}"
-        )
-
-        if candidate.is_file():
-            start_the_file(path)
-            return
 
 
 def check_the_file(name: str, dict_i: dict, folder: str, status_name: str) -> tuple[str, int] | bool:
@@ -442,11 +422,11 @@ def open_the_file(file: ClassFile, project_name: str):
         case StatusFile.is_send:
             start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
 
-def delete_the_local_folder_with_project(project_name: str) -> bool:
+def delete_the_local_folder_with_the_project(project_name: str) -> bool:
     path = Path(variables.new_local_folder)/variables.temporary_files/project_name
-    print("i delete the folder", path)
     try:
         #shutil.rmtree(path)
+        print("i have deleted the folder", path)
         return True
     except Exception as err:
         print("delete error", path)
@@ -527,7 +507,7 @@ def get_new_list_of_files_in_the_protocol(dict_files: dict, list_of_files: list[
     return new_list_of_file
 
 
-def file_excel_open_get_date(file_name: str) -> dict | None:
+def file_excel_open_get_date(file_name: Path) -> dict | None:
     with (open(file_name, "rb") as f):
         try:
             in_mem_file = io.BytesIO(f.read())
