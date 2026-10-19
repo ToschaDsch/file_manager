@@ -38,7 +38,7 @@ class GeneralWindow(QMainWindow):
         raw_list_of_all_folder: list[Path] = [p for p in dir_0.iterdir() if p.is_dir()]
         self._list_of_years: list[str] = [y.stem for y in
                                           (filter(lambda x: (x.stem[0:4] == variables.name_of_the_folder), raw_list_of_all_folder))]
-        self._current_year: Path = Path(variables.current_year)
+        self._current_year: str = variables.current_year
         self._current_dir_year: Path = Path(variables.dir_for_checking) / variables.current_year
         self._current_list_of_files_for_the_year = []
         self._current_project: str = variables.current_project
@@ -265,7 +265,7 @@ class GeneralWindow(QMainWindow):
 
     def open_the_picked_files(self):
         for file in self._picked_files:
-            open_the_file(file=file, project_name=self._current_project)
+            open_the_file(file=file, project_name=self._current_project, current_year=self._current_year)
         self.select_rows(row_indices=self._selected_rows)
 
     def make_list_of_file_in_the_protocol(self):
@@ -340,7 +340,7 @@ class GeneralWindow(QMainWindow):
                                                        current_project=self._current_project)
                     self.move_the_file(file=file)
                 else:
-                    move_from_checked_to_to_send(file=file, protocol=protocol,
+                    move_from_checked_to_to_send(file=file, protocol=protocol, current_year=self._current_year,
                                                        current_project=self._current_project)
         file.nr_protokol = int(self._last_two_numbers_of_current_protocol)
         return None
@@ -734,4 +734,4 @@ class GeneralWindow(QMainWindow):
 
     def double_click_the_table_item(self, item: QTableWidgetItem):
         file: ClassFile = self._list_class_files[item.row()]
-        open_the_file(file=file, project_name=self._current_project)
+        open_the_file(file=file, project_name=self._current_project, current_year=self._current_year)

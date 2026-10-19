@@ -76,6 +76,7 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
 
 
 def start_file_is_send(path: Path, name: str, subdir: str) -> None:
+
     start_the_file(path)
     return
 
@@ -243,13 +244,13 @@ def get_only_files(path: Path) -> list[Path]:
 from pathlib import Path
 
 
-def start_file_by_status(project_name: str, name: str, protokol_nr: int, folder_to_check: str, subdir: str,
+def start_file_by_status(project_name: str, name: str, protokol_nr: int, folder_to_check: str, subdir: str, current_year: str
 ) -> None:
     match folder_to_check:
         case variables.by_checking | variables.checked_files_planes:
             path = Path(variables.new_local_folder) / variables.temporary_files / project_name / folder_to_check
         case variables.files_to_send:
-            path = Path(variables.dir_for_checking) / project_name / variables.files_to_send
+            path = (Path(variables.dir_for_checking) / current_year / project_name / variables.checked_files / variables.files_to_send)
 
     if subdir:
         path = path.parent
@@ -347,12 +348,12 @@ def move_from_by_checking_to_checked(file: ClassFile, current_project: str, prot
     file.status = StatusFile.checked
 
 
-def move_from_checked_to_to_send(file: ClassFile, current_project: str, protocol: str = "",
+def move_from_checked_to_to_send(file: ClassFile, current_year: str, current_project: str, protocol: str = "",
 ) -> None:
 
     checked_root = (Path(variables.new_local_folder)/ variables.temporary_files/current_project/variables.checked_files_planes)
 
-    send_root = (Path(variables.checked_files)/ variables.files_to_send)
+    send_root = (Path(variables.dir_for_checking)/current_year/current_project/variables.checked_files/ variables.files_to_send)
 
     if protocol:
         checked_root /= protocol
@@ -406,19 +407,19 @@ def move_the_file_with_the_status(file: ClassFile, new_protocol: str, status_pat
     move_the_file(old_path=old_path,new_path=new_path)
 
 
-def open_the_file(file: ClassFile, project_name: str):
+def open_the_file(file: ClassFile, project_name: str, current_year: str):
     match file.status:
         case StatusFile.unchecked:
             start_the_file(path=file.path)
         case StatusFile.by_checking:
             start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
-                                 folder_to_check=variables.by_checking, subdir=file.subdir)
+                                 folder_to_check=variables.by_checking, subdir=file.subdir, current_year=current_year)
         case StatusFile.checked:
             start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
-                                 folder_to_check=variables.checked_files_planes, subdir=file.subdir)
+                                 folder_to_check=variables.checked_files_planes, subdir=file.subdir, current_year=current_year)
         case StatusFile.to_send:
             start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
-                                 folder_to_check=variables.files_to_send, subdir=file.subdir)
+                                 folder_to_check=variables.files_to_send, subdir=file.subdir, current_year=current_year)
         case StatusFile.is_send:
             start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
 
