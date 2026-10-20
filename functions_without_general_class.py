@@ -75,9 +75,22 @@ def get_list_of_all_protocols(dir_protocols: Path) -> tuple[list[str], list[str]
     return not_send_protocols, send_protocols
 
 
-def start_file_is_send(path: Path, name: str, subdir: str) -> None:
+def start_file_is_send(path: Path, name: str) -> None:
+    checked_path = path / variables.checked_files
 
-    start_the_file(path)
+    if not checked_path.is_dir():
+        print("no subdir", variables.checked_files)
+        return
+
+    pdf_names: set[str] = {p.name for p in checked_path.iterdir() if p.is_file()}
+    dict_with_send_files = pdf_names
+    stem, end = name[:-4], name[-4:]
+    for file_end in variables.variants_of_the_ending:
+        name_i = stem + file_end + end
+        if name_i in dict_with_send_files:
+            path = checked_path / name_i
+            print(path)
+            start_the_file(path)
     return
 
 
@@ -421,7 +434,8 @@ def open_the_file(file: ClassFile, project_name: str, current_year: str):
             start_file_by_status(project_name=project_name, name=file.name, protokol_nr=file.nr_protokol,
                                  folder_to_check=variables.files_to_send, subdir=file.subdir, current_year=current_year)
         case StatusFile.is_send:
-            start_file_is_send(path=file.path, name=file.name, subdir=file.subdir)
+            path = Path(variables.dir_for_checking) / current_year / project_name
+            start_file_is_send(path=path, name=file.name)
 
 def delete_the_local_folder_with_the_project(project_name: str) -> bool:
     path = Path(variables.new_local_folder)/variables.temporary_files/project_name
